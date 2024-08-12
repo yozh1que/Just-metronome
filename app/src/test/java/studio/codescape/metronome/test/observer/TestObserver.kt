@@ -19,11 +19,9 @@ class TestObserver<T>(
     }
 
     private fun collect() {
-        println("$coroutineContext")
         job = launch {
             flow
                 .collect { value ->
-                    println("collect $value")
                     values.add(value)
                 }
         }
