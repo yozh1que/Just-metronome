@@ -9,32 +9,31 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import studio.codescape.metronome.domain.model.Metronome
+import studio.codescape.metronome.domain.model.settings.Settings
 import timber.log.Timber
 
-class MetronomeRepositoryDataStoreImpl(
+class MetronomeSettingsRepositoryDataStoreImpl(
     private val dataStore: DataStore<Preferences>
-) : MetronomeRepository {
+) : MetronomeSettingsRepository {
 
-    private val metronomePreferenceKey: Preferences.Key<String>
-        get() = stringPreferencesKey(metronomeKey)
+    private val settingsPreferenceKey: Preferences.Key<String>
+        get() = stringPreferencesKey(settingsKey)
 
-    override val metronome: Flow<Metronome?> = dataStore
+    override val metronome: Flow<Settings?> = dataStore
         .data
-        .map { preferences -> preferences[metronomePreferenceKey] }
-        .map { serializedMetronome ->
-            serializedMetronome
-                ?.let { metronomeString ->
+        .map { preferences ->
+            preferences[settingsPreferenceKey]
+                ?.let { serializedSettings ->
                     runCatchingSerialization {
-                        Json.decodeFromString<Metronome>(metronomeString)
+                        Json.decodeFromString<Settings>(serializedSettings)
                     }
                 }
         }
 
-    override suspend fun set(metronome: Metronome) {
+    override suspend fun set(settings: Settings) {
         dataStore.edit { preferences ->
-            preferences[metronomePreferenceKey] =
-                runCatchingSerialization { Json.encodeToString(metronome) }.orEmpty()
+            preferences[settingsPreferenceKey] =
+                runCatchingSerialization { Json.encodeToString(settings) }.orEmpty()
         }
     }
 
@@ -43,7 +42,7 @@ class MetronomeRepositoryDataStoreImpl(
     } catch (e: RuntimeException) {
         Timber.e(
             e,
-            "Failed to serialize/deserialize Metronome structure.".takeIf {
+            "Failed to serialize/deserialize Settings structure.".takeIf {
                 e is SerializationException || e is IllegalArgumentException
             }
         )
@@ -51,6 +50,6 @@ class MetronomeRepositoryDataStoreImpl(
     }
 
     private companion object {
-        private const val metronomeKey = "metronome"
+        private const val settingsKey = "metronome settings"
     }
 }

@@ -18,10 +18,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
-import studio.codescape.metronome.domain.model.Metronome
+import studio.codescape.metronome.domain.model.settings.Settings
 
 @RunWith(RobolectricTestRunner::class)
-class MetronomeRepositoryDataStoreImplTest {
+class MetronomeSettingsRepositoryDataStoreImplTest {
 
     @Test
     fun `stores metronome`() = runTest {
@@ -32,16 +32,16 @@ class MetronomeRepositoryDataStoreImplTest {
             RuntimeEnvironment.getApplication().preferencesDataStoreFile(storageKey)
         }
         advanceUntilIdle()
-        val metronomeRepository = MetronomeRepositoryDataStoreImpl(
+        val metronomeRepository = MetronomeSettingsRepositoryDataStoreImpl(
             datastore
         )
 
         assertNull(metronomeRepository.metronome.first())
-        metronomeRepository.set(stubMetronome)
+        metronomeRepository.set(stubSettings)
         advanceUntilIdle()
 
         assertEquals(
-            stubMetronome,
+            stubSettings,
             metronomeRepository.metronome.first()
         )
         coroutineContext.cancelChildren()
@@ -49,7 +49,7 @@ class MetronomeRepositoryDataStoreImplTest {
 
     private companion object {
         private const val storageKey = "METRONOME_STORAGE"
-        private val stubMetronome = Metronome.Running(100)
+        private val stubSettings = Settings(60)
     }
 
 }

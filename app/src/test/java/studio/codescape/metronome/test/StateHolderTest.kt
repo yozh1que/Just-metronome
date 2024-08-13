@@ -8,15 +8,19 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlin.coroutines.CoroutineContext
 
-abstract class ViewModelTest<T> {
+abstract class StateHolderTest<T> {
 
-    abstract fun createViewModel(): T
+    abstract fun createStateHolder(parentCoroutineContext: CoroutineContext): T
 
-    fun runViewModelTest(before: TestScope.() -> Unit = {}, block: TestScope.(viewModel: T) -> Unit) = runTest {
+    fun runStateHolderTest(
+        before: TestScope.() -> Unit = {},
+        block: suspend TestScope.(stateHolder: T) -> Unit
+    ) = runTest {
         Dispatchers.setMain(coroutineContext[CoroutineDispatcher.Key]!!)
         before()
-        block(createViewModel())
+        block(createStateHolder(coroutineContext))
     }
 
 }
