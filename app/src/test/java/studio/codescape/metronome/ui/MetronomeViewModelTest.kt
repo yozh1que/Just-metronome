@@ -21,8 +21,8 @@ import studio.codescape.metronome.R
 import studio.codescape.metronome.domain.model.State
 import studio.codescape.metronome.domain.model.settings.Settings
 import studio.codescape.metronome.domain.usecase.GetMetronomeBeat
-import studio.codescape.metronome.domain.usecase.GetMetronomeSettings
 import studio.codescape.metronome.domain.usecase.GetMetronomeState
+import studio.codescape.metronome.domain.usecase.settings.GetMetronomeSettings
 import studio.codescape.metronome.test.StateHolderTest
 import studio.codescape.metronome.test.observer.observe
 import kotlin.coroutines.CoroutineContext
@@ -55,7 +55,7 @@ class MetronomeViewModelTest : StateHolderTest<MetronomeViewModel>() {
 
     @Test
     fun `collects metronome state after being created`() = runStateHolderTest { viewModel ->
-        whenever(mockGetMetronomeState.invoke()).thenReturn(flowOf(State.Idle))
+        whenever(mockGetMetronomeState.invoke()).thenReturn(flowOf(State.Paused))
         whenever(mockGetMetronomeSettings.invoke()).thenReturn(flowOf(stubMetronomeSettings))
 
         viewModel.state.observe {
@@ -63,7 +63,7 @@ class MetronomeViewModelTest : StateHolderTest<MetronomeViewModel>() {
 
             expectValues(
                 UiState(
-                    mainIconRes = R.drawable.ic_play_circle_outline_24,
+                    mainIcon = UiState.MainIcon.Drawable(R.drawable.ic_play_circle_outline_24),
                     beatsPerMinuteLabel = "$stubBeatsPerMinute"
                 )
             )
@@ -71,18 +71,19 @@ class MetronomeViewModelTest : StateHolderTest<MetronomeViewModel>() {
     }
 
     @Test
-    fun `converts state collection errors turning state to null`() = runStateHolderTest { viewModel ->
-        whenever(mockGetMetronomeSettings.invoke()).thenReturn(flow { throw RuntimeException() })
+    fun `converts state collection errors turning state to null`() =
+        runStateHolderTest { viewModel ->
+            whenever(mockGetMetronomeSettings.invoke()).thenReturn(flow { throw RuntimeException() })
 
-        viewModel.state.observe {
-            advanceUntilIdle()
+            viewModel.state.observe {
+                advanceUntilIdle()
 
-            expectValues(null)
+                expectValues(null)
+            }
         }
-    }
 
     @Test
-    fun `retries state collection on request`() = runStateHolderTest {  viewModel ->
+    fun `retries state collection on request`() = runStateHolderTest { viewModel ->
         whenever(mockGetMetronomeSettings.invoke()).thenReturn(flow { throw RuntimeException() })
 
         viewModel.state.observe {
@@ -106,9 +107,9 @@ class MetronomeViewModelTest : StateHolderTest<MetronomeViewModel>() {
 
             advanceUntilIdle()
             expectValues(
-                Effect.Beat,
-                Effect.Beat,
-                Effect.Beat
+                Effect.ShowBeat,
+                Effect.ShowBeat,
+                Effect.ShowBeat
             )
         }
     }

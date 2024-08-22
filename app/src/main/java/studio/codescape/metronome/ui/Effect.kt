@@ -1,5 +1,5 @@
 package studio.codescape.metronome.ui
 
 interface Effect {
-    object Beat : Effect
+    object ShowBeat : Effect
 }

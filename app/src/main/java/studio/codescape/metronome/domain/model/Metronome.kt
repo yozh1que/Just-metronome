@@ -9,23 +9,22 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import studio.codescape.metronome.domain.usecase.GetMetronomeSettings
+import studio.codescape.metronome.domain.usecase.settings.SettingsInteractor
+import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 class Metronome(
-    private val getMetronomeSettings: GetMetronomeSettings,
+    private val settingsInteractor: SettingsInteractor,
     parentCoroutineContext: CoroutineContext = EmptyCoroutineContext
 ) : CoroutineScope {
 
@@ -38,31 +37,37 @@ class Metronome(
 
     init {
         state = produceState()
-            .stateIn(this, SharingStarted.Lazily, null)
-            .filterNotNull()
+            .stateIn(this, SharingStarted.Eagerly, initialState)
         effects = produceEffects()
     }
 
-    private fun produceState(): Flow<State> = commands
+    private fun produceState(): Flow<State> =
+        produceReadyState()
+
+    private fun produceReadyState() = commands
         .receiveAsFlow()
         .filter { command -> command == Command.Toggle }
-        .scan(false) { startMetronome, _ -> !startMetronome }
-        .map { startMetronome ->
-            State.Running.takeIf { startMetronome } ?: State.Idle
+        .scan<Command, State>(initialState) { currentState, _ ->
+            State.Paused.takeIf { currentState is State.Resumed } ?: State.Resumed
         }
 
     private fun produceEffects(): Flow<Effect> = state
-        .filterIsInstance<State.Running>()
-        .flatMapConcat { state ->
-            getMetronomeSettings()
-                .flatMapConcat { settings ->
-                    flow {
-                        while (isActive) {
-                            emit(Effect.Beat)
-                            delay(oneMinuteMillis / settings.beatsPerMinute)
+        .flatMapLatest { state ->
+            when (state) {
+                State.Resumed -> settingsInteractor
+                    .settings
+                    .flatMapLatest { settings ->
+                        flow {
+                            while (isActive) {
+                                Timber.d("DEBUG_BEAT, emit")
+                                emit(Effect.Beat)
+                                delay(oneMinuteMillis / settings.beatsPerMinute)
+                            }
                         }
                     }
-                }
+
+                else -> emptyFlow()
+            }
         }
 
 
@@ -73,6 +78,7 @@ class Metronome(
     }
 
     private companion object {
+        private val initialState = State.Paused
         private const val oneMinuteMillis = 1000L * 60
     }
 

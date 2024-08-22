@@ -13,32 +13,33 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import studio.codescape.metronome.domain.model.settings.Settings
-import studio.codescape.metronome.domain.usecase.GetMetronomeSettings
+import studio.codescape.metronome.domain.usecase.settings.SettingsInteractor
 import studio.codescape.metronome.test.StateHolderTest
 import studio.codescape.metronome.test.observer.observe
 import kotlin.coroutines.CoroutineContext
 
 class MetronomeTest : StateHolderTest<Metronome>() {
 
+
     @Mock
-    private lateinit var mockGetMetronomeSettings: GetMetronomeSettings
+    private lateinit var mockSettingsInteractor: SettingsInteractor
 
     override fun createStateHolder(parentCoroutineContext: CoroutineContext): Metronome = Metronome(
-        getMetronomeSettings = mockGetMetronomeSettings,
+        settingsInteractor = mockSettingsInteractor,
         parentCoroutineContext = parentCoroutineContext
     )
 
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
-        whenever(mockGetMetronomeSettings.invoke()).thenReturn(flowOf(stubSettings))
+        whenever(mockSettingsInteractor.settings).thenReturn(flowOf(stubSettings))
     }
 
     @Test
     fun `initially idle`() = runStateHolderTest { metronome ->
         metronome.state.observe {
             advanceUntilIdle()
-            expectValues(State.Idle)
+            expectValues(State.Paused)
         }
     }
 
@@ -50,8 +51,8 @@ class MetronomeTest : StateHolderTest<Metronome>() {
                 metronome.handleCommand(Command.Toggle)
                 advanceUntilIdle()
                 expectValues(
-                    State.Idle,
-                    State.Running
+                    State.Paused,
+                    State.Resumed
                 )
             }
         }
@@ -70,7 +71,7 @@ class MetronomeTest : StateHolderTest<Metronome>() {
                     advanceTimeFor1Beat()
                     expectValues(*(0..iter).map { Effect.Beat }.toTypedArray())
                 }
-                verify(mockGetMetronomeSettings).invoke()
+                verify(mockSettingsInteractor).settings
             }
         }
 
