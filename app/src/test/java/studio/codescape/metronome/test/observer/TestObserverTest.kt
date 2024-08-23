@@ -1,8 +1,5 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
-
 package studio.codescape.metronome.test.observer
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flowOf

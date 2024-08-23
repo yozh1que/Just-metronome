@@ -1,8 +1,5 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
-
 package studio.codescape.metronome.ui
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.emptyFlow

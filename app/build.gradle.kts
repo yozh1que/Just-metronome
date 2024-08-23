@@ -37,7 +37,10 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
-        freeCompilerArgs = freeCompilerArgs + "-Xcontext-receivers"
+        freeCompilerArgs = freeCompilerArgs +
+                "-Xcontext-receivers" +
+                "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi" +
+                "-Xopt-in=kotlin.ExperimentalStdlibApi"
     }
     buildFeatures {
         compose = true

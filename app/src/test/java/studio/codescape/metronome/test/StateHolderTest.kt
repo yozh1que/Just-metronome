@@ -1,10 +1,7 @@
-@file:OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class)
-
 package studio.codescape.metronome.test
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain

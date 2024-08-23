@@ -1,12 +1,9 @@
-@file:OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class)
-
 package studio.codescape.metronome.application.repository
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.preferencesDataStoreFile
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.advanceUntilIdle

@@ -1,10 +1,7 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
-
 package studio.codescape.metronome.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,8 +20,8 @@ import studio.codescape.metronome.R
 import studio.codescape.metronome.domain.model.State
 import studio.codescape.metronome.domain.model.settings.Settings
 import studio.codescape.metronome.domain.usecase.GetMetronomeBeat
-import studio.codescape.metronome.domain.usecase.settings.GetMetronomeSettings
 import studio.codescape.metronome.domain.usecase.GetMetronomeState
+import studio.codescape.metronome.domain.usecase.settings.GetMetronomeSettings
 import timber.log.Timber
 
 class MetronomeViewModel(
