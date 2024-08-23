@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import studio.codescape.metronome.application.repository.MetronomeSettingsRepository
 import studio.codescape.metronome.domain.model.settings.Settings
-import studio.codescape.metronome.domain.usecase.GetMetronomeSettings
+import studio.codescape.metronome.domain.usecase.settings.GetMetronomeSettings
 
 class GetMetronomeSettingsImpl(
     private val metronomeSettingsRepository: MetronomeSettingsRepository
