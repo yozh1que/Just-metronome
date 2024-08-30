@@ -1,4 +1,4 @@
-package studio.codescape.metronome.application.usecase
+package studio.codescape.metronome.application.usecase.settings
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -10,7 +10,7 @@ class GetMetronomeSettingsImpl(
     private val metronomeSettingsRepository: MetronomeSettingsRepository
 ) : GetMetronomeSettings {
     override fun invoke(): Flow<Settings> = metronomeSettingsRepository
-        .metronome
+        .settings
         .map { metronome -> metronome ?: defaultSettings }
 
     private companion object {

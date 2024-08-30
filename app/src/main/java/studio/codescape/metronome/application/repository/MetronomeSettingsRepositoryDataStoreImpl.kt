@@ -19,7 +19,7 @@ class MetronomeSettingsRepositoryDataStoreImpl(
     private val settingsPreferenceKey: Preferences.Key<String>
         get() = stringPreferencesKey(settingsKey)
 
-    override val metronome: Flow<Settings?> = dataStore
+    override val settings: Flow<Settings?> = dataStore
         .data
         .map { preferences ->
             preferences[settingsPreferenceKey]
