@@ -33,13 +33,13 @@ class MetronomeSettingsRepositoryDataStoreImplTest {
             datastore
         )
 
-        assertNull(metronomeRepository.metronome.first())
+        assertNull(metronomeRepository.settings.first())
         metronomeRepository.set(stubSettings)
         advanceUntilIdle()
 
         assertEquals(
             stubSettings,
-            metronomeRepository.metronome.first()
+            metronomeRepository.settings.first()
         )
         coroutineContext.cancelChildren()
     }

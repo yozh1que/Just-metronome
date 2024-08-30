@@ -10,6 +10,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 import studio.codescape.metronome.application.repository.MetronomeSettingsRepository
+import studio.codescape.metronome.application.usecase.settings.GetMetronomeSettingsImpl
 import studio.codescape.metronome.domain.model.settings.Settings
 
 class GetMetronomeSettingsImplTest {
@@ -26,7 +27,7 @@ class GetMetronomeSettingsImplTest {
 
     @Test
     fun `returns default metronome settings if not set`() = runTest {
-        whenever(mockMetronomeSettingsRepository.metronome).thenReturn(flowOf(null))
+        whenever(mockMetronomeSettingsRepository.settings).thenReturn(flowOf(null))
         assertEquals(
             Settings(
                 beatsPerMinute = 60
