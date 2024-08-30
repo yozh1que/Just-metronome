@@ -2,11 +2,17 @@ package studio.codescape.metronome.player.domain.model
 
 sealed interface State {
 
-    data object Loading : State
+    val soundUri: String
 
-    data class Ready(
-        val metronomeState: studio.codescape.metronome.domain.model.State
+    data class Loading(
+        override val soundUri: String
     ) : State
 
-    data object Failure: State
+    data class Ready(
+        override val soundUri: String
+    ) : State
+
+    data class Failure(
+        override val soundUri: String
+    ) : State
 }

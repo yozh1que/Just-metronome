@@ -7,7 +7,8 @@ class SettingsInteractor(
     private val getMetronomeSettings: GetMetronomeSettings,
     private val setBeatsPerMinuteSettings: SetBeatsPerMinuteSettings
 ) {
-    val settings: Flow<Settings> = getMetronomeSettings()
+    val settings: Flow<Settings>
+        get() = getMetronomeSettings()
 
     suspend fun setBeatsPerMinute(beatsPerMinute: Int) = setBeatsPerMinuteSettings(beatsPerMinute)
 }

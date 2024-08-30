@@ -1,4 +1,6 @@
 package studio.codescape.metronome.player.domain.model
 
-class Command {
+sealed interface Command {
+    @JvmInline
+    value class SetSound(val uri: String) : Command
 }
