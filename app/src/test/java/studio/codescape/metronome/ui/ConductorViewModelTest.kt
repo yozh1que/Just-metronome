@@ -15,45 +15,45 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import studio.codescape.metronome.R
-import studio.codescape.metronome.domain.model.State
-import studio.codescape.metronome.domain.model.settings.Settings
-import studio.codescape.metronome.domain.usecase.GetMetronomeBeat
-import studio.codescape.metronome.domain.usecase.GetMetronomeState
-import studio.codescape.metronome.domain.usecase.settings.GetMetronomeSettings
+import studio.codescape.metronome.conductor.domain.model.State
+import studio.codescape.metronome.conductor.domain.model.settings.Settings
+import studio.codescape.metronome.conductor.domain.usecase.GetBeat
+import studio.codescape.metronome.conductor.domain.usecase.GetConductorState
+import studio.codescape.metronome.conductor.domain.usecase.settings.GetConductorSettings
 import studio.codescape.metronome.test.StateHolderTest
 import studio.codescape.metronome.test.observer.observe
 import kotlin.coroutines.CoroutineContext
 
-class MetronomeViewModelTest : StateHolderTest<MetronomeViewModel>() {
+class ConductorViewModelTest : StateHolderTest<MetronomeViewModel>() {
 
     @Mock
-    private lateinit var mockGetMetronomeState: GetMetronomeState
+    private lateinit var mockGetConductorState: GetConductorState
 
     @Mock
-    private lateinit var mockGetMetronomeSettings: GetMetronomeSettings
+    private lateinit var mockGetConductorSettings: GetConductorSettings
 
     @Mock
-    private lateinit var mockGetMetronomeBeat: GetMetronomeBeat
+    private lateinit var mockGetBeat: GetBeat
 
     override fun createStateHolder(parentCoroutineContext: CoroutineContext): MetronomeViewModel =
         MetronomeViewModel(
-            getMetronomeState = mockGetMetronomeState,
-            getMetronomeSettings = mockGetMetronomeSettings,
-            getMetronomeBeat = mockGetMetronomeBeat
+            getConductorState = mockGetConductorState,
+            getConductorSettings = mockGetConductorSettings,
+            getBeat = mockGetBeat
         )
 
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
-        whenever(mockGetMetronomeState.invoke()).thenReturn(emptyFlow())
-        whenever(mockGetMetronomeSettings.invoke()).thenReturn(emptyFlow())
-        whenever(mockGetMetronomeBeat.invoke()).thenReturn(emptyFlow())
+        whenever(mockGetConductorState.invoke()).thenReturn(emptyFlow())
+        whenever(mockGetConductorSettings.invoke()).thenReturn(emptyFlow())
+        whenever(mockGetBeat.invoke()).thenReturn(emptyFlow())
     }
 
     @Test
     fun `collects metronome state after being created`() = runStateHolderTest { viewModel ->
-        whenever(mockGetMetronomeState.invoke()).thenReturn(flowOf(State.Paused))
-        whenever(mockGetMetronomeSettings.invoke()).thenReturn(flowOf(stubMetronomeSettings))
+        whenever(mockGetConductorState.invoke()).thenReturn(flowOf(State.Paused))
+        whenever(mockGetConductorSettings.invoke()).thenReturn(flowOf(stubMetronomeSettings))
 
         viewModel.state.observe {
             advanceUntilIdle()
@@ -70,7 +70,7 @@ class MetronomeViewModelTest : StateHolderTest<MetronomeViewModel>() {
     @Test
     fun `converts state collection errors turning state to null`() =
         runStateHolderTest { viewModel ->
-            whenever(mockGetMetronomeSettings.invoke()).thenReturn(flow { throw RuntimeException() })
+            whenever(mockGetConductorSettings.invoke()).thenReturn(flow { throw RuntimeException() })
 
             viewModel.state.observe {
                 advanceUntilIdle()
@@ -81,21 +81,21 @@ class MetronomeViewModelTest : StateHolderTest<MetronomeViewModel>() {
 
     @Test
     fun `retries state collection on request`() = runStateHolderTest { viewModel ->
-        whenever(mockGetMetronomeSettings.invoke()).thenReturn(flow { throw RuntimeException() })
+        whenever(mockGetConductorSettings.invoke()).thenReturn(flow { throw RuntimeException() })
 
         viewModel.state.observe {
             advanceUntilIdle()
             viewModel.handleCommand(Command.Retry)
             advanceUntilIdle()
 
-            verify(mockGetMetronomeSettings, times(2)).invoke()
+            verify(mockGetConductorSettings, times(2)).invoke()
         }
     }
 
     @Test
     fun `relays metronome beats after being created`() = runStateHolderTest { viewModel ->
         val beatsChannel = Channel<Unit>()
-        whenever(mockGetMetronomeBeat.invoke()).thenReturn(beatsChannel.consumeAsFlow())
+        whenever(mockGetBeat.invoke()).thenReturn(beatsChannel.consumeAsFlow())
 
         viewModel.effects.observe {
             repeat(3) {

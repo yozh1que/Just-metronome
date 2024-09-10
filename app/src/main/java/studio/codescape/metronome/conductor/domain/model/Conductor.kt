@@ -1,4 +1,4 @@
-package studio.codescape.metronome.domain.model
+package studio.codescape.metronome.conductor.domain.model
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -15,12 +15,12 @@ import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import studio.codescape.metronome.domain.usecase.settings.SettingsInteractor
+import studio.codescape.metronome.conductor.domain.usecase.settings.SettingsInteractor
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-class Metronome(
+class Conductor(
     private val settingsInteractor: SettingsInteractor,
     parentCoroutineContext: CoroutineContext = EmptyCoroutineContext
 ) : CoroutineScope {

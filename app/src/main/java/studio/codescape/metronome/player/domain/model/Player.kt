@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import studio.codescape.metronome.domain.model.Effect
-import studio.codescape.metronome.domain.model.Metronome
+import studio.codescape.metronome.conductor.domain.model.Effect
+import studio.codescape.metronome.conductor.domain.model.Conductor
 import studio.codescape.metronome.player.domain.usecase.GetSoundLoaded
 import studio.codescape.metronome.player.domain.usecase.PlayBeatSound
 import studio.codescape.metronome.player.domain.usecase.settings.SettingsInteractor
@@ -25,7 +25,7 @@ import kotlin.coroutines.CoroutineContext
 // resource loading
 // observes metronome effects
 class Player(
-    private val metronome: Metronome,
+    private val conductor: Conductor,
     private val settingsInteractor: SettingsInteractor,
     getSoundLoaded: GetSoundLoaded,
     private val playBeatSound: PlayBeatSound,
@@ -67,7 +67,7 @@ class Player(
         }
     }
 
-    private fun State.Ready.consumeBeatEffects() = metronome
+    private fun State.Ready.consumeBeatEffects() = conductor
         .effects
         .filter { effect -> effect == Effect.Beat }
 

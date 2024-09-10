@@ -9,19 +9,23 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import studio.codescape.metronome.domain.model.settings.Settings
-import studio.codescape.metronome.domain.usecase.settings.SettingsInteractor
+import studio.codescape.metronome.conductor.domain.model.Command
+import studio.codescape.metronome.conductor.domain.model.Effect
+import studio.codescape.metronome.conductor.domain.model.Conductor
+import studio.codescape.metronome.conductor.domain.model.State
+import studio.codescape.metronome.conductor.domain.model.settings.Settings
+import studio.codescape.metronome.conductor.domain.usecase.settings.SettingsInteractor
 import studio.codescape.metronome.test.StateHolderTest
 import studio.codescape.metronome.test.observer.observe
 import kotlin.coroutines.CoroutineContext
 
-class MetronomeTest : StateHolderTest<Metronome>() {
+class ConductorTest : StateHolderTest<Conductor>() {
 
 
     @Mock
     private lateinit var mockSettingsInteractor: SettingsInteractor
 
-    override fun createStateHolder(parentCoroutineContext: CoroutineContext): Metronome = Metronome(
+    override fun createStateHolder(parentCoroutineContext: CoroutineContext): Conductor = Conductor(
         settingsInteractor = mockSettingsInteractor,
         parentCoroutineContext = parentCoroutineContext
     )

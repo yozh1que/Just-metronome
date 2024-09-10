@@ -17,17 +17,17 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import studio.codescape.metronome.R
-import studio.codescape.metronome.domain.model.State
-import studio.codescape.metronome.domain.model.settings.Settings
-import studio.codescape.metronome.domain.usecase.GetMetronomeBeat
-import studio.codescape.metronome.domain.usecase.GetMetronomeState
-import studio.codescape.metronome.domain.usecase.settings.GetMetronomeSettings
+import studio.codescape.metronome.conductor.domain.model.State
+import studio.codescape.metronome.conductor.domain.model.settings.Settings
+import studio.codescape.metronome.conductor.domain.usecase.GetBeat
+import studio.codescape.metronome.conductor.domain.usecase.GetConductorState
+import studio.codescape.metronome.conductor.domain.usecase.settings.GetConductorSettings
 import timber.log.Timber
 
 class MetronomeViewModel(
-    private val getMetronomeState: GetMetronomeState,
-    private val getMetronomeSettings: GetMetronomeSettings,
-    private val getMetronomeBeat: GetMetronomeBeat,
+    private val getConductorState: GetConductorState,
+    private val getConductorSettings: GetConductorSettings,
+    private val getBeat: GetBeat,
 ) : ViewModel() {
 
     private val _commands = Channel<Command>()
@@ -49,8 +49,8 @@ class MetronomeViewModel(
     private fun produceState() = getInitIntents()
         .flatMapLatest {
             combine<State, Settings, UiState?>(
-                getMetronomeState(),
-                getMetronomeSettings()
+                getConductorState(),
+                getConductorSettings()
             ) { state, settings ->
                 UiState(
                     mainIcon = when (state) {
@@ -71,7 +71,7 @@ class MetronomeViewModel(
 
     private fun produceEffects() =
         getInitIntents().flatMapLatest {
-            getMetronomeBeat()
+            getBeat()
                 .map { Effect.ShowBeat }
                 .catch { e ->
                     Timber.e(e, "Metronome beat collection failed.")

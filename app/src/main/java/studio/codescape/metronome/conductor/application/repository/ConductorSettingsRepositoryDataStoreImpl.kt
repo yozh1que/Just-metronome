@@ -1,4 +1,4 @@
-package studio.codescape.metronome.application.repository
+package studio.codescape.metronome.conductor.application.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import studio.codescape.metronome.domain.model.settings.Settings
+import studio.codescape.metronome.conductor.domain.model.settings.Settings
 import timber.log.Timber
 
-class MetronomeSettingsRepositoryDataStoreImpl(
+class ConductorSettingsRepositoryDataStoreImpl(
     private val dataStore: DataStore<Preferences>
-) : MetronomeSettingsRepository {
+) : ConductorSettingsRepository {
 
     private val settingsPreferenceKey: Preferences.Key<String>
         get() = stringPreferencesKey(settingsKey)

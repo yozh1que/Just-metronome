@@ -1,4 +1,4 @@
-package studio.codescape.metronome.domain.model
+package studio.codescape.metronome.conductor.domain.model
 
 interface Command {
     object Toggle : Command
