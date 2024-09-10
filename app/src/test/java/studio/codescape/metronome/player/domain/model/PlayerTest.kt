@@ -12,7 +12,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.whenever
-import studio.codescape.metronome.domain.model.Metronome
+import studio.codescape.metronome.conductor.domain.model.Conductor
 import studio.codescape.metronome.player.domain.model.settings.Settings
 import studio.codescape.metronome.player.domain.usecase.GetSoundLoaded
 import studio.codescape.metronome.player.domain.usecase.PlayBeatSound
@@ -24,7 +24,7 @@ import kotlin.coroutines.CoroutineContext
 class PlayerTest : StateHolderTest<Player>() {
 
     @Mock
-    private lateinit var mockMetronome: Metronome
+    private lateinit var mockConductor: Conductor
 
     @Mock
     private lateinit var mockGetSoundLoaded: GetSoundLoaded
@@ -36,7 +36,7 @@ class PlayerTest : StateHolderTest<Player>() {
     private lateinit var mockSettingsInteractor: SettingsInteractor
 
     override fun createStateHolder(parentCoroutineContext: CoroutineContext): Player = Player(
-        mockMetronome,
+        mockConductor,
         mockSettingsInteractor,
         mockGetSoundLoaded,
         mockPlayBeatSound,
@@ -46,8 +46,8 @@ class PlayerTest : StateHolderTest<Player>() {
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
-        whenever(mockMetronome.state).thenReturn(flowOf(stubInitialMetronomeState))
-        whenever(mockMetronome.effects).thenReturn(emptyFlow())
+        whenever(mockConductor.state).thenReturn(flowOf(stubConductorState))
+        whenever(mockConductor.effects).thenReturn(emptyFlow())
         whenever(mockSettingsInteractor.settings).thenReturn(flowOf(stubSettings))
         doNothing().whenever(mockPlayBeatSound).invoke()
     }
@@ -70,7 +70,7 @@ class PlayerTest : StateHolderTest<Player>() {
     }
 
     private companion object {
-        private val stubInitialMetronomeState = studio.codescape.metronome.domain.model.State.Paused
+        private val stubConductorState = studio.codescape.metronome.conductor.domain.model.State.Paused
         private const val stubSoundUri = ""
         private val stubSettings = Settings(soundUri = stubSoundUri)
     }

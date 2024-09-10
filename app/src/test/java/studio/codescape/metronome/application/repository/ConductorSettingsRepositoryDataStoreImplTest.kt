@@ -15,10 +15,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
-import studio.codescape.metronome.domain.model.settings.Settings
+import studio.codescape.metronome.conductor.application.repository.ConductorSettingsRepositoryDataStoreImpl
+import studio.codescape.metronome.conductor.domain.model.settings.Settings
 
 @RunWith(RobolectricTestRunner::class)
-class MetronomeSettingsRepositoryDataStoreImplTest {
+class ConductorSettingsRepositoryDataStoreImplTest {
 
     @Test
     fun `stores metronome`() = runTest {
@@ -29,7 +30,7 @@ class MetronomeSettingsRepositoryDataStoreImplTest {
             RuntimeEnvironment.getApplication().preferencesDataStoreFile(storageKey)
         }
         advanceUntilIdle()
-        val metronomeRepository = MetronomeSettingsRepositoryDataStoreImpl(
+        val metronomeRepository = ConductorSettingsRepositoryDataStoreImpl(
             datastore
         )
 

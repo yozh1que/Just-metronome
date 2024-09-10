@@ -1,14 +1,14 @@
-package studio.codescape.metronome.domain.usecase.settings
+package studio.codescape.metronome.conductor.domain.usecase.settings
 
 import kotlinx.coroutines.flow.Flow
-import studio.codescape.metronome.domain.model.settings.Settings
+import studio.codescape.metronome.conductor.domain.model.settings.Settings
 
 class SettingsInteractor(
-    private val getMetronomeSettings: GetMetronomeSettings,
+    private val getConductorSettings: GetConductorSettings,
     private val setBeatsPerMinuteSettings: SetBeatsPerMinuteSettings
 ) {
     val settings: Flow<Settings>
-        get() = getMetronomeSettings()
+        get() = getConductorSettings()
 
     suspend fun setBeatsPerMinute(beatsPerMinute: Int) = setBeatsPerMinuteSettings(beatsPerMinute)
 }
