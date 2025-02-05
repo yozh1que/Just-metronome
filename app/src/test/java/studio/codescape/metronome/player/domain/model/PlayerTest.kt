@@ -11,6 +11,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.doNothing
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import studio.codescape.metronome.conductor.domain.model.Conductor
 import studio.codescape.metronome.player.domain.model.settings.Settings
@@ -24,9 +25,6 @@ import kotlin.coroutines.CoroutineContext
 class PlayerTest : StateHolderTest<Player>() {
 
     @Mock
-    private lateinit var mockConductor: Conductor
-
-    @Mock
     private lateinit var mockGetSoundLoaded: GetSoundLoaded
 
     @Mock
@@ -36,7 +34,6 @@ class PlayerTest : StateHolderTest<Player>() {
     private lateinit var mockSettingsInteractor: SettingsInteractor
 
     override fun createStateHolder(parentCoroutineContext: CoroutineContext): Player = Player(
-        mockConductor,
         mockSettingsInteractor,
         mockGetSoundLoaded,
         mockPlayBeatSound,
@@ -46,8 +43,6 @@ class PlayerTest : StateHolderTest<Player>() {
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
-        whenever(mockConductor.state).thenReturn(flowOf(stubConductorState))
-        whenever(mockConductor.effects).thenReturn(emptyFlow())
         whenever(mockSettingsInteractor.settings).thenReturn(flowOf(stubSettings))
         doNothing().whenever(mockPlayBeatSound).invoke()
     }
@@ -69,8 +64,22 @@ class PlayerTest : StateHolderTest<Player>() {
         }
     }
 
+    @Test
+    fun `in ready state plays sound when command is received`() = runStateHolderTest { player ->
+        player.state.observe {
+            whenever(mockGetSoundLoaded.invoke()).thenReturn(flowOf(Unit))
+
+            advanceUntilIdle()
+
+            player.handleCommand(Command.PlaySound)
+
+            advanceUntilIdle()
+
+            verify(mockPlayBeatSound).invoke()
+        }
+    }
+
     private companion object {
-        private val stubConductorState = studio.codescape.metronome.conductor.domain.model.State.Paused
         private const val stubSoundUri = ""
         private val stubSettings = Settings(soundUri = stubSoundUri)
     }

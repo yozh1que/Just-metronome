@@ -6,7 +6,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -15,24 +14,21 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import studio.codescape.metronome.conductor.domain.model.Effect
-import studio.codescape.metronome.conductor.domain.model.Conductor
 import studio.codescape.metronome.player.domain.usecase.GetSoundLoaded
 import studio.codescape.metronome.player.domain.usecase.PlayBeatSound
 import studio.codescape.metronome.player.domain.usecase.settings.SettingsInteractor
 import kotlin.coroutines.CoroutineContext
 
-// resource loading
-// observes conductor effects
 class Player(
-    private val conductor: Conductor,
     private val settingsInteractor: SettingsInteractor,
     getSoundLoaded: GetSoundLoaded,
     private val playBeatSound: PlayBeatSound,
     parentCoroutineContext: CoroutineContext,
 ) : CoroutineScope {
 
-    private val commands = Channel<Command>()
+    // splitting command channels to avoid suspending either of type subscribers due to high load
+    private val playSoundCommands = Channel<Command.PlaySound>()
+    private val setSoundCommands = Channel<Command.SetSound>()
 
     override val coroutineContext: CoroutineContext = parentCoroutineContext + Job()
 
@@ -49,33 +45,42 @@ class Player(
             .filterNotNull()
 
     init {
+        produceSideEffects()
+    }
+
+    private fun produceSideEffects() {
+        playSoundBeats()
+        updateSoundUriSetting()
+    }
+
+    private fun updateSoundUriSetting() {
         launch {
-            state
-                .filterIsInstance<State.Ready>()
-                .flatMapLatest { state -> state.consumeBeatEffects() }
-                .collect {
-                    playBeatSound()
-                }
-        }
-        launch {
-            commands
+            setSoundCommands
                 .receiveAsFlow()
-                .filterIsInstance<Command.SetSound>()
                 .collect { command ->
                     settingsInteractor.setSoundUri(command.uri)
                 }
         }
     }
 
-    private fun State.Ready.consumeBeatEffects() = conductor
-        .effects
-        .filter { effect -> effect == Effect.Beat }
-
-    fun handleCommand(command: Command) {
+    private fun playSoundBeats() {
         launch {
-            commands.send(command)
+            state
+                .filterIsInstance<State.Ready>()
+                .flatMapLatest { playSoundCommands.receiveAsFlow() }
+                .collect {
+                    playBeatSound()
+                }
         }
     }
 
+    fun handleCommand(command: Command) {
+        launch {
+            when (command) {
+                is Command.PlaySound -> playSoundCommands.send(command)
+                is Command.SetSound -> setSoundCommands.send(command)
+            }
+        }
+    }
 
 }
