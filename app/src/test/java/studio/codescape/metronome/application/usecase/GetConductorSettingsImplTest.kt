@@ -18,15 +18,13 @@ class GetConductorSettingsImplTest {
     @Mock
     private lateinit var mockConductorSettingsRepository: ConductorSettingsRepository
 
-    private lateinit var getMetronomeImpl: GetConductorSettingsImpl
-
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
     }
 
     @Test
-    fun `returns default metronome settings if not set`() = runTest {
+    fun `returns default conductor settings if not set`() = runTest {
         whenever(mockConductorSettingsRepository.settings).thenReturn(flowOf(null))
         assertEquals(
             Settings(

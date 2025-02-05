@@ -23,7 +23,7 @@ import studio.codescape.metronome.player.domain.usecase.settings.SettingsInterac
 import kotlin.coroutines.CoroutineContext
 
 // resource loading
-// observes metronome effects
+// observes conductor effects
 class Player(
     private val conductor: Conductor,
     private val settingsInteractor: SettingsInteractor,

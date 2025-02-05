@@ -22,7 +22,7 @@ import studio.codescape.metronome.conductor.domain.model.settings.Settings
 class ConductorSettingsRepositoryDataStoreImplTest {
 
     @Test
-    fun `stores metronome`() = runTest {
+    fun `stores conductor`() = runTest {
         Dispatchers.setMain(coroutineContext[CoroutineDispatcher.Key]!!)
         val datastore = PreferenceDataStoreFactory.create(
             scope = this
@@ -30,17 +30,17 @@ class ConductorSettingsRepositoryDataStoreImplTest {
             RuntimeEnvironment.getApplication().preferencesDataStoreFile(storageKey)
         }
         advanceUntilIdle()
-        val metronomeRepository = ConductorSettingsRepositoryDataStoreImpl(
+        val conductorSettingsRepository = ConductorSettingsRepositoryDataStoreImpl(
             datastore
         )
 
-        assertNull(metronomeRepository.settings.first())
-        metronomeRepository.set(stubSettings)
+        assertNull(conductorSettingsRepository.settings.first())
+        conductorSettingsRepository.set(stubSettings)
         advanceUntilIdle()
 
         assertEquals(
             stubSettings,
-            metronomeRepository.settings.first()
+            conductorSettingsRepository.settings.first()
         )
         coroutineContext.cancelChildren()
     }
