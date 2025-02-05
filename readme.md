@@ -5,3 +5,9 @@ Well.. this small project strives to do just what its name implies keeping afore
 
 ### Assets
 * **Sound**: [Rimshot](https://freesound.org/people/Sajmund/sounds/132417/), [Claive](https://freesound.org/people/Sajmund/sounds/132418/), [Ping](https://freesound.org/people/jolup123/sounds/668790/) (courtesy of freesound.org)
+
+### C4
+```bash
+docker pull structurizr/lite
+docker run -it --rm -p 8080:8080 -v PROJECT_ROOT/docs/:/usr/local/structurizr structurizr/lite
+```
