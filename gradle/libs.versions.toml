@@ -2,7 +2,7 @@
 #plugin versions
 agp = "8.5.2"
 #libraries
-kotlin = "2.0.10"
+kotlin = "2.1.10"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
