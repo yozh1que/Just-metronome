@@ -8,5 +8,6 @@
 .externalNativeBuild
 .cxx
 local.properties
-
+.attach_pid*
+# c4 modeling
 */.structurizr/*
