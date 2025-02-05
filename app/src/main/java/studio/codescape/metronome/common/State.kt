@@ -1,4 +1,4 @@
-package studio.codescape.metronome.util
+package studio.codescape.metronome.common
 
 sealed interface State<T> {
     @JvmInline

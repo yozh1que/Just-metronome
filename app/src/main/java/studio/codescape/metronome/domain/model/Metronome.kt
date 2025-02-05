@@ -2,19 +2,18 @@ package studio.codescape.metronome.domain.model
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import me.tatarka.inject.annotations.Inject
 import studio.codescape.metronome.conductor.domain.model.Conductor
-import studio.codescape.metronome.conductor.domain.usecase.CreateConductor
-import studio.codescape.metronome.player.domain.model.Player
-import studio.codescape.metronome.player.domain.usecase.CreatePlayer
 import kotlin.coroutines.CoroutineContext
 
+@Inject
 class Metronome(
-    private val createConductor: CreateConductor,
-    private val createPlayer: CreatePlayer,
-    parentCoroutineContext: CoroutineContext
+    private val conductor: Conductor,
+//    private val createConductor: CreateConductor,
+//    private val createPlayer: CreatePlayer,
 ) : CoroutineScope {
 
-    override val coroutineContext: CoroutineContext = parentCoroutineContext + Job()
+    override val coroutineContext: CoroutineContext = Job()
 
 
 

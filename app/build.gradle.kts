@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.serialization.compiler)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -13,6 +14,7 @@ android {
         applicationId = "studio.codescape.metronome"
         minSdk = 24
         targetSdk = 34
+        compileSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -54,8 +56,15 @@ android {
     testOptions.unitTests.isIncludeAndroidResources = true
 }
 
+ksp {
+    arg("me.tatarka.inject.dumpGraph", "true")
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
+    ksp(libs.kotlin.inject.compiler)
+    implementation(libs.kotlin.inject.runtime)
+
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.coroutines)
     implementation(libs.androidx.activity.compose)
@@ -67,16 +76,20 @@ dependencies {
     implementation(libs.androidx.media3.player)
     implementation(libs.serialization.json)
     implementation(libs.logging.console)
+
+
     testImplementation(libs.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.mockito)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.media3.test.utils)
     testImplementation(libs.androidx.media3.test.utils.robolectric)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.tooling.preview)
     debugImplementation(libs.androidx.ui.test.manifest)

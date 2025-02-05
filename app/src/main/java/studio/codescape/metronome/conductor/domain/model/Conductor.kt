@@ -15,14 +15,17 @@ import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import me.tatarka.inject.annotations.Inject
+import studio.codescape.metronome.common.qualifiers.Singleton
 import studio.codescape.metronome.conductor.domain.usecase.settings.SettingsInteractor
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
+@Inject
+@Singleton
 class Conductor(
     private val settingsInteractor: SettingsInteractor,
-    parentCoroutineContext: CoroutineContext = EmptyCoroutineContext
+    parentCoroutineContext: CoroutineContext
 ) : CoroutineScope {
 
     override val coroutineContext: CoroutineContext = parentCoroutineContext + Job()

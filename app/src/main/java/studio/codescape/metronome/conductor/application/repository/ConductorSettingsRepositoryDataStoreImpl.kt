@@ -9,9 +9,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import me.tatarka.inject.annotations.Inject
+import studio.codescape.metronome.common.qualifiers.Singleton
 import studio.codescape.metronome.conductor.domain.model.settings.Settings
 import timber.log.Timber
 
+@Inject
+@Singleton
 class ConductorSettingsRepositoryDataStoreImpl(
     private val dataStore: DataStore<Preferences>
 ) : ConductorSettingsRepository {
