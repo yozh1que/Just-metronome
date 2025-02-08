@@ -4,12 +4,12 @@ workspace "Name" "Description" {
 
     model {
 
-        u = person "User"
+        user = person "User"
 
-        ss = softwareSystem "Metronome" {
+        system = softwareSystem "Metronome" {
 
-            app = container "App" {
-                metronome = component "Metronome" "Aggregate providing external API. Sets up lifecycle of composing components."
+            mobileApp = container "Mobile app" {
+                metronome = component "Metronome" "Aggregate providing external API. Sets up lifecycle of composing components"
 
                 conductor = component "Conductor" "Generates rhythmic intervals"
                 conductorSettings = component "Conductor settings" "Manages rhythm settings" {
@@ -23,11 +23,26 @@ workspace "Name" "Description" {
                 }
                 player -> playerSettings "includes"
 
-                u -> app "Practices rhythm with"
+
                 metronome -> conductor "listens to rhythmic intervals"
                 metronome -> player "instructs player to play sounds"
-            }
 
+                app = component "App" {
+                    description "Parent component that handles supervises child components lifecycle, errors"
+                }
+
+                session = component "Session" {
+                    description "Child component that manages metronome sessions"
+                    technology "Dagger, Coroutines"
+                }
+                session -> app "Sends errors via CoroutineScope hierarchy" {
+                    tags "error"
+                }
+                session -> metronome "Creates and provides to clients (e.g. UI)"
+                app -> session "Start, stops, restarts in case error occurs"
+
+            }
+            user -> mobileApp "Practices rhythm with"
         }
     }
 
@@ -49,6 +64,11 @@ workspace "Name" "Description" {
             }
             element "Storage" {
                 shape cylinder
+            }
+            relationship "error" {
+                color #ff0000
+                dashed true
+                thickness 2
             }
         }
     }
