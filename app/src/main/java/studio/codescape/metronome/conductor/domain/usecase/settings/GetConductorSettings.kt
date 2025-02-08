@@ -3,12 +3,10 @@ package studio.codescape.metronome.conductor.domain.usecase.settings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import me.tatarka.inject.annotations.Inject
-import studio.codescape.metronome.common.qualifiers.Singleton
 import studio.codescape.metronome.conductor.application.repository.SettingsRepository
 import studio.codescape.metronome.conductor.domain.model.settings.Settings
 
 @Inject
-@Singleton
 class GetConductorSettings(
     private val settingsRepository: SettingsRepository
 ) {

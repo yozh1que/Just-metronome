@@ -10,7 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import me.tatarka.inject.annotations.Component
 import me.tatarka.inject.annotations.Provides
-import studio.codescape.metronome.common.qualifiers.Singleton
+import me.tatarka.inject.annotations.Scope
 import studio.codescape.metronome.conductor.application.repository.SettingsRepository
 import studio.codescape.metronome.conductor.application.repository.SettingsRepositoryDataStoreImpl
 import studio.codescape.metronome.conductor.domain.model.Conductor
@@ -19,7 +19,11 @@ import kotlin.coroutines.CoroutineContext
 typealias StorageFileName = String
 typealias IoDispatcher = CoroutineDispatcher
 
-@Singleton
+@Scope
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER)
+annotation class ConductorScope
+
+@ConductorScope
 @Component
 abstract class ConductorComponent(
     @get:Provides val context: Context,
@@ -42,7 +46,7 @@ private class ConductorSettings {
         val SettingsRepositoryDataStoreImpl.bind: SettingsRepository
             @Provides get() = this
 
-        @Singleton
+        @ConductorScope
         @Provides
         fun dataStore(
             context: Context,
