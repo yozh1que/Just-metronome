@@ -16,19 +16,16 @@ import timber.log.Timber
 
 @Inject
 @Singleton
-class ConductorSettingsRepositoryDataStoreImpl(
+class SettingsRepositoryDataStoreImpl(
     private val dataStore: DataStore<Preferences>
-) : ConductorSettingsRepository {
-
-    private val settingsPreferenceKey: Preferences.Key<String>
-        get() = stringPreferencesKey(settingsKey)
+) : SettingsRepository {
 
     override val settings: Flow<Settings?> = dataStore
         .data
         .map { preferences ->
-            preferences[settingsPreferenceKey]
+            preferences[CONDUCTOR_SETTINGS_PREFERENCE_KEY]
                 ?.let { serializedSettings ->
-                    runCatchingSerialization {
+                    runCatchingSerializationExceptions {
                         Json.decodeFromString<Settings>(serializedSettings)
                     }
                 }
@@ -36,24 +33,29 @@ class ConductorSettingsRepositoryDataStoreImpl(
 
     override suspend fun set(settings: Settings) {
         dataStore.edit { preferences ->
-            preferences[settingsPreferenceKey] =
-                runCatchingSerialization { Json.encodeToString(settings) }.orEmpty()
+            preferences[CONDUCTOR_SETTINGS_PREFERENCE_KEY] =
+                runCatchingSerializationExceptions { Json.encodeToString(settings) }.orEmpty()
         }
     }
 
-    private fun <T> runCatchingSerialization(block: () -> T): T? = try {
+    private fun <T> runCatchingSerializationExceptions(block: () -> T): T? = try {
         block()
-    } catch (e: RuntimeException) {
-        Timber.e(
-            e,
-            "Failed to serialize/deserialize Settings structure.".takeIf {
-                e is SerializationException || e is IllegalArgumentException
+    } catch (e: Throwable) {
+        when (e) {
+            is SerializationException, is IllegalArgumentException -> {
+                Timber.e(
+                    e,
+                    "Failed to serialize/deserialize Settings structure."
+                )
+                null
             }
-        )
-        null
+
+            else -> throw e
+        }
     }
 
     private companion object {
-        private const val settingsKey = "metronome settings"
+        private val CONDUCTOR_SETTINGS_PREFERENCE_KEY: Preferences.Key<String> =
+             stringPreferencesKey("conductor settings")
     }
 }

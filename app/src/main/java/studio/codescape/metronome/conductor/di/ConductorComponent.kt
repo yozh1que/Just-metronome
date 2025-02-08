@@ -10,8 +10,8 @@ import kotlinx.coroutines.SupervisorJob
 import me.tatarka.inject.annotations.Component
 import me.tatarka.inject.annotations.Provides
 import studio.codescape.metronome.common.qualifiers.Singleton
-import studio.codescape.metronome.conductor.application.repository.ConductorSettingsRepository
-import studio.codescape.metronome.conductor.application.repository.ConductorSettingsRepositoryDataStoreImpl
+import studio.codescape.metronome.conductor.application.repository.SettingsRepository
+import studio.codescape.metronome.conductor.application.repository.SettingsRepositoryDataStoreImpl
 import studio.codescape.metronome.conductor.application.usecase.settings.GetConductorSettingsImpl
 import studio.codescape.metronome.conductor.application.usecase.settings.SetBeatsPerMinuteSettingsImpl
 import studio.codescape.metronome.conductor.domain.model.Conductor
@@ -40,7 +40,7 @@ private class ConductorSettings {
 
     interface RepositoryComponent {
 
-        val ConductorSettingsRepositoryDataStoreImpl.bind: ConductorSettingsRepository
+        val SettingsRepositoryDataStoreImpl.bind: SettingsRepository
             @Provides get() = this
 
         @Singleton

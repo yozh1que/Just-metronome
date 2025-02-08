@@ -4,16 +4,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import me.tatarka.inject.annotations.Inject
 import studio.codescape.metronome.common.qualifiers.Singleton
-import studio.codescape.metronome.conductor.application.repository.ConductorSettingsRepository
+import studio.codescape.metronome.conductor.application.repository.SettingsRepository
 import studio.codescape.metronome.conductor.domain.model.settings.Settings
 import studio.codescape.metronome.conductor.domain.usecase.settings.GetConductorSettings
 
 @Inject
 @Singleton
 class GetConductorSettingsImpl(
-    private val conductorSettingsRepository: ConductorSettingsRepository
+    private val settingsRepository: SettingsRepository
 ) : GetConductorSettings {
-    override fun invoke(): Flow<Settings> = conductorSettingsRepository
+    override fun invoke(): Flow<Settings> = settingsRepository
         .settings
         .map { metronome -> metronome ?: defaultSettings }
 
