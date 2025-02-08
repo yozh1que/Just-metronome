@@ -43,8 +43,8 @@ class ConductorViewModelTest : StateHolderTest<MetronomeViewModel>() {
         )
 
     @Before
-    fun before() {
-        MockitoAnnotations.openMocks(this)
+    override fun before() {
+        super.before()
         whenever(mockGetConductorState.invoke()).thenReturn(emptyFlow())
         whenever(mockGetConductorSettings.invoke()).thenReturn(emptyFlow())
         whenever(mockGetBeat.invoke()).thenReturn(emptyFlow())

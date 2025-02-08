@@ -7,7 +7,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlin.coroutines.CoroutineContext
 
-abstract class StateHolderTest<T> {
+abstract class StateHolderTest<T> : UnitTest() {
 
     abstract fun createStateHolder(parentCoroutineContext: CoroutineContext): T
 

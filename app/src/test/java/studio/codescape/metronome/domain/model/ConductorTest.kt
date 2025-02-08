@@ -31,8 +31,8 @@ class ConductorTest : StateHolderTest<Conductor>() {
     )
 
     @Before
-    fun before() {
-        MockitoAnnotations.openMocks(this)
+    override fun before() {
+        super.before()
         whenever(mockSettingsInteractor.settings).thenReturn(flowOf(stubSettings))
     }
 

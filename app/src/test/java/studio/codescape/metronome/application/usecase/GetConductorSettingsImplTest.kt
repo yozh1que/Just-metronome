@@ -12,16 +12,13 @@ import org.mockito.kotlin.whenever
 import studio.codescape.metronome.conductor.application.repository.ConductorSettingsRepository
 import studio.codescape.metronome.conductor.application.usecase.settings.GetConductorSettingsImpl
 import studio.codescape.metronome.conductor.domain.model.settings.Settings
+import studio.codescape.metronome.test.UnitTest
 
-class GetConductorSettingsImplTest {
+class GetConductorSettingsImplTest : UnitTest() {
 
     @Mock
     private lateinit var mockConductorSettingsRepository: ConductorSettingsRepository
 
-    @Before
-    fun before() {
-        MockitoAnnotations.openMocks(this)
-    }
 
     @Test
     fun `returns default conductor settings if not set`() = runTest {
