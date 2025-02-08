@@ -12,7 +12,6 @@ import me.tatarka.inject.annotations.Provides
 import studio.codescape.metronome.common.qualifiers.Singleton
 import studio.codescape.metronome.conductor.application.repository.SettingsRepository
 import studio.codescape.metronome.conductor.application.repository.SettingsRepositoryDataStoreImpl
-import studio.codescape.metronome.conductor.application.usecase.settings.GetConductorSettingsImpl
 import studio.codescape.metronome.conductor.application.usecase.settings.SetBeatsPerMinuteSettingsImpl
 import studio.codescape.metronome.conductor.domain.model.Conductor
 import studio.codescape.metronome.conductor.domain.usecase.settings.GetConductorSettings
@@ -31,8 +30,6 @@ abstract class ConductorComponent(
 private class ConductorSettings {
 
     interface UseCaseComponent {
-        val GetConductorSettingsImpl.bind: GetConductorSettings
-            @Provides get() = this
 
         val SetBeatsPerMinuteSettingsImpl.bind: SetBeatsPerMinuteSettings
             @Provides get() = this

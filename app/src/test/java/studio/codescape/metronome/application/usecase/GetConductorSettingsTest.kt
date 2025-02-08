@@ -8,10 +8,10 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.kotlin.whenever
 import studio.codescape.metronome.conductor.application.repository.SettingsRepository
-import studio.codescape.metronome.conductor.application.usecase.settings.GetConductorSettingsImpl
+import studio.codescape.metronome.conductor.domain.usecase.settings.GetConductorSettings
 import studio.codescape.metronome.test.UnitTest
 
-class GetConductorSettingsImplTest : UnitTest() {
+class GetConductorSettingsTest : UnitTest() {
 
     @Mock
     private lateinit var mockSettingsRepository: SettingsRepository
@@ -21,11 +21,8 @@ class GetConductorSettingsImplTest : UnitTest() {
         whenever(mockSettingsRepository.settings).thenReturn(flowOf(null))
 
         assertEquals(
-            Settings(
-                beatsPerMinute = 60
-            ),
-            GetConductorSettingsImpl(mockConductorSettingsRepository).invoke().first()
-            GetConductorSettingsImpl(mockSettingsRepository).invoke().first()
+            GetConductorSettings.DEFAULT_SETTINGS,
+            GetConductorSettings(mockSettingsRepository).invoke().first()
         )
     }
 }
