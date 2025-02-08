@@ -1,7 +1,6 @@
 package studio.codescape.metronome.player.domain.model
 
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -9,11 +8,11 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import studio.codescape.metronome.conductor.domain.model.Conductor
+import studio.codescape.metronome.player.domain.model.Player.Command
+import studio.codescape.metronome.player.domain.model.Player.State
 import studio.codescape.metronome.player.domain.model.settings.Settings
 import studio.codescape.metronome.player.domain.usecase.GetSoundLoaded
 import studio.codescape.metronome.player.domain.usecase.PlayBeatSound

@@ -26,6 +26,29 @@ class Player(
     parentCoroutineContext: CoroutineContext,
 ) : CoroutineScope {
 
+    sealed interface Command {
+        @JvmInline
+        value class SetSound(val uri: String) : Command
+        data object PlaySound : Command
+    }
+
+    sealed interface State {
+
+        val soundUri: String
+
+        data class Loading(
+            override val soundUri: String
+        ) : State
+
+        data class Ready(
+            override val soundUri: String
+        ) : State
+
+        data class Failure(
+            override val soundUri: String
+        ) : State
+    }
+    
     // splitting command channels to avoid suspending either of type subscribers due to high load
     private val playSoundCommands = Channel<Command.PlaySound>()
     private val setSoundCommands = Channel<Command.SetSound>()

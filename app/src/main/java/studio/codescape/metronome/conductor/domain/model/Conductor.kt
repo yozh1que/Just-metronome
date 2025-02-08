@@ -28,6 +28,27 @@ class Conductor(
     parentCoroutineContext: CoroutineContext
 ) : CoroutineScope {
 
+    interface Command {
+        object Toggle : Command
+
+        @JvmInline
+        value class SetBeatsPerMinute(
+            val beatsPerMinute: Int
+        ) : Command
+    }
+
+    sealed interface State {
+
+        data object Paused : State
+
+        data object Resumed : State
+
+    }
+
+    interface Effect {
+        data object Beat : Effect
+    }
+
     override val coroutineContext: CoroutineContext = parentCoroutineContext + Job()
 
     val state: Flow<State>

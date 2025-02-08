@@ -10,12 +10,11 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import studio.codescape.metronome.R
-import studio.codescape.metronome.conductor.domain.model.State
+import studio.codescape.metronome.conductor.domain.model.Conductor.State
 import studio.codescape.metronome.conductor.domain.model.settings.Settings
 import studio.codescape.metronome.conductor.domain.usecase.GetBeat
 import studio.codescape.metronome.conductor.domain.usecase.GetConductorState

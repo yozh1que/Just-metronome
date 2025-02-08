@@ -6,13 +6,12 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import studio.codescape.metronome.conductor.domain.model.Command
-import studio.codescape.metronome.conductor.domain.model.Effect
 import studio.codescape.metronome.conductor.domain.model.Conductor
-import studio.codescape.metronome.conductor.domain.model.State
+import studio.codescape.metronome.conductor.domain.model.Conductor.Command
+import studio.codescape.metronome.conductor.domain.model.Conductor.Effect
+import studio.codescape.metronome.conductor.domain.model.Conductor.State
 import studio.codescape.metronome.conductor.domain.model.settings.Settings
 import studio.codescape.metronome.conductor.domain.usecase.settings.SettingsInteractor
 import studio.codescape.metronome.test.StateHolderTest

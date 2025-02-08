@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import studio.codescape.metronome.R
-import studio.codescape.metronome.conductor.domain.model.State
+import studio.codescape.metronome.conductor.domain.model.Conductor.State
 import studio.codescape.metronome.conductor.domain.model.settings.Settings
 import studio.codescape.metronome.conductor.domain.usecase.GetBeat
 import studio.codescape.metronome.conductor.domain.usecase.GetConductorState
