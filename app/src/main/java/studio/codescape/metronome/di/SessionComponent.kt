@@ -1,10 +1,12 @@
 package studio.codescape.metronome.di
 
+import android.content.Context
 import kotlinx.coroutines.CoroutineScope
 import me.tatarka.inject.annotations.Component
 import me.tatarka.inject.annotations.Provides
 import me.tatarka.inject.annotations.Scope
 import studio.codescape.metronome.conductor.di.ConductorComponent
+import studio.codescape.metronome.conductor.di.create
 import studio.codescape.metronome.domain.model.Metronome
 import kotlin.coroutines.CoroutineContext
 
@@ -12,20 +14,37 @@ import kotlin.coroutines.CoroutineContext
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER)
 annotation class SessionScope
 
+typealias SessionCoroutineScope = CoroutineScope
+
 @Component
 @SessionScope
 abstract class SessionComponent(
+    @Component val appComponent: AppComponent,
     @get:Provides val parentCoroutineContext: CoroutineContext,
-    @Component val conductorComponent: ConductorComponent
 ) {
 
+    abstract val metronome: Metronome
+    abstract val sessionCoroutineScope: SessionCoroutineScope
 
     @SessionScope
     @Provides
-    internal fun sessionCoroutineScope(parentCoroutineContext: CoroutineContext) =
+    internal fun metronome(conductorComponent: ConductorComponent): Metronome = Metronome(
+        conductorComponent.conductor
+    )
+
+    @SessionScope
+    @Provides
+    internal fun sessionCoroutineScope(parentCoroutineContext: CoroutineContext): SessionCoroutineScope =
         CoroutineScope(parentCoroutineContext)
 
-    abstract val metronome: Metronome
-    abstract val sessionCoroutineScope: CoroutineScope
+    @SessionScope
+    @Provides
+    internal fun conductorComponent(
+        context: Context,
+        sessionCoroutineScope: SessionCoroutineScope,
+    ): ConductorComponent = ConductorComponent::class.create(
+        context = context,
+        parentCoroutineContext = sessionCoroutineScope.coroutineContext
+    )
 
 }
