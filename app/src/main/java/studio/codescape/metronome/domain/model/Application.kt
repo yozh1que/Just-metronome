@@ -1,4 +1,4 @@
-package studio.codescape.metronome
+package studio.codescape.metronome.domain.model
 
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -16,10 +16,10 @@ import studio.codescape.metronome.di.SessionComponent
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-class MetronomeApplication(
+class Application(
     parentCoroutineContext: CoroutineContext = EmptyCoroutineContext,
     createAppComponent: () -> AppComponent,
-    private val createSessionComponent: (parentCoroutineContext: CoroutineContext) -> SessionComponent,
+    private val createSessionComponent: (appComponent: AppComponent, parentCoroutineContext: CoroutineContext) -> SessionComponent,
 ) : CoroutineScope {
 
     sealed interface Command {
@@ -63,7 +63,7 @@ class MetronomeApplication(
                     State.Session(
                         index = 0,
                         appComponent = state.appComponent,
-                        sessionComponent = createSessionComponent(this@MetronomeApplication.coroutineContext)
+                        sessionComponent = createSessionComponent(state.appComponent, this@Application.coroutineContext)
                     )
                 } else {
                     state
@@ -73,7 +73,7 @@ class MetronomeApplication(
                     state.cancel()
                     State.Session(
                         appComponent = state.appComponent,
-                        sessionComponent = createSessionComponent(this@MetronomeApplication.coroutineContext),
+                        sessionComponent = createSessionComponent(state.appComponent, this@Application.coroutineContext),
                         index = state.index + 1
                     )
                 } else {

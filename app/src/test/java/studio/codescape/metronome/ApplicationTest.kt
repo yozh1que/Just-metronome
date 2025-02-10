@@ -8,11 +8,12 @@ import org.mockito.Mock
 import org.mockito.kotlin.whenever
 import studio.codescape.metronome.di.AppComponent
 import studio.codescape.metronome.di.SessionComponent
+import studio.codescape.metronome.domain.model.Application
 import studio.codescape.metronome.test.StateHolderTest
 import studio.codescape.metronome.test.observer.observe
 import kotlin.coroutines.CoroutineContext
 
-class MetronomeApplicationTest : StateHolderTest<MetronomeApplication>() {
+class ApplicationTest : StateHolderTest<Application>() {
 
     @Mock
     private lateinit var mockAppComponent: AppComponent
@@ -20,11 +21,11 @@ class MetronomeApplicationTest : StateHolderTest<MetronomeApplication>() {
     @Mock
     private lateinit var mockSessionComponent: SessionComponent
 
-    override fun createStateHolder(parentCoroutineContext: CoroutineContext): MetronomeApplication =
-        MetronomeApplication(
+    override fun createStateHolder(parentCoroutineContext: CoroutineContext): Application =
+        Application(
             parentCoroutineContext = parentCoroutineContext,
             createAppComponent = { mockAppComponent },
-            createSessionComponent = { mockSessionComponent }
+            createSessionComponent = { _, _-> mockSessionComponent }
         )
 
     @Test
@@ -34,18 +35,18 @@ class MetronomeApplicationTest : StateHolderTest<MetronomeApplication>() {
 
         app.state.observe {
             advanceUntilIdle()
-            app.handleCommand(MetronomeApplication.Command.Start)
+            app.handleCommand(Application.Command.Start)
             advanceUntilIdle()
             sessionScope.launch { throw RuntimeException() }
             advanceUntilIdle()
 
             expectValues(
-                MetronomeApplication.State.Idle(mockAppComponent),
-                MetronomeApplication.State.Session(
+                Application.State.Idle(mockAppComponent),
+                Application.State.Session(
                     appComponent = mockAppComponent,
                     sessionComponent = mockSessionComponent
                 ),
-                MetronomeApplication.State.Session(
+                Application.State.Session(
                     index = 1,
                     appComponent = mockAppComponent,
                     sessionComponent = mockSessionComponent

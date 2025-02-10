@@ -23,7 +23,7 @@ import studio.codescape.metronome.test.StateHolderTest
 import studio.codescape.metronome.test.observer.observe
 import kotlin.coroutines.CoroutineContext
 
-class ConductorViewModelTest : StateHolderTest<MetronomeViewModel>() {
+class MetronomeViewModelTest : StateHolderTest<MetronomeViewModel>() {
 
     @Mock
     private lateinit var mockGetConductorState: GetConductorState
@@ -58,8 +58,8 @@ class ConductorViewModelTest : StateHolderTest<MetronomeViewModel>() {
             advanceUntilIdle()
 
             expectValues(
-                UiState(
-                    mainIcon = UiState.MainIcon.Drawable(R.drawable.ic_play_circle_outline_24),
+                MetronomeViewModel.UiState(
+                    mainIcon = MetronomeViewModel.UiState.MainIcon.Drawable(R.drawable.ic_play_circle_outline_24),
                     beatsPerMinuteLabel = "$stubBeatsPerMinute"
                 )
             )
@@ -84,7 +84,7 @@ class ConductorViewModelTest : StateHolderTest<MetronomeViewModel>() {
 
         viewModel.state.observe {
             advanceUntilIdle()
-            viewModel.handleCommand(Command.Retry)
+            viewModel.handleCommand(MetronomeViewModel.Command.Retry)
             advanceUntilIdle()
 
             verify(mockGetConductorSettings, times(2)).invoke()
@@ -103,9 +103,9 @@ class ConductorViewModelTest : StateHolderTest<MetronomeViewModel>() {
 
             advanceUntilIdle()
             expectValues(
-                Effect.ShowBeat,
-                Effect.ShowBeat,
-                Effect.ShowBeat
+                MetronomeViewModel.Effect.ShowBeat,
+                MetronomeViewModel.Effect.ShowBeat,
+                MetronomeViewModel.Effect.ShowBeat
             )
         }
     }

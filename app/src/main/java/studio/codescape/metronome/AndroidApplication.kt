@@ -1,30 +1,29 @@
 package studio.codescape.metronome
 
-import android.app.Application
+import android.content.Context
 import studio.codescape.metronome.di.AppComponent
 import studio.codescape.metronome.di.SessionComponent
 import studio.codescape.metronome.di.create
+import studio.codescape.metronome.domain.model.Application
 
-class AndroidApplication : Application() {
+class AndroidApplication : android.app.Application() {
 
-    private lateinit var metronomeApplication: MetronomeApplication
+    lateinit var application: Application
 
     override fun onCreate() {
         super.onCreate()
-        metronomeApplication = getMetronomeApplication()
+        application = getMetronomeApplication()
     }
 
-    private fun getMetronomeApplication(): MetronomeApplication =
-        AppComponent::class.create(applicationContext).let { appComponent ->
-            MetronomeApplication(
-                createAppComponent = { appComponent },
-                createSessionComponent = { parentCoroutineContext ->
-                    SessionComponent::class.create(
-                        appComponent = appComponent,
-                        parentCoroutineContext = parentCoroutineContext,
-                    )
-                }
-            )
-        }
-
+    private fun getMetronomeApplication(): Application =
+        Application(
+            createAppComponent = { AppComponent::class.create(applicationContext) },
+            createSessionComponent = { appComponent, parentCoroutineContext ->
+                SessionComponent::class.create(
+                    appComponent = appComponent,
+                    parentCoroutineContext = parentCoroutineContext,
+                )
+            }
+        )
 }
+fun Context.getMetronomeApplication(): Application = (this as AndroidApplication).application

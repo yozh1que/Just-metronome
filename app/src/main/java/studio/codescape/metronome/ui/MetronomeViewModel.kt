@@ -1,5 +1,6 @@
 package studio.codescape.metronome.ui
 
+import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
@@ -30,6 +31,28 @@ class MetronomeViewModel(
     private val getBeat: GetBeat,
 ) : ViewModel() {
 
+    sealed interface Command {
+        data object Retry : Command
+    }
+
+    data class UiState(
+        val mainIcon: MainIcon,
+        val beatsPerMinuteLabel: String
+    ) {
+        sealed interface MainIcon {
+            data object IndeterminateProgress : MainIcon
+
+            @JvmInline
+            value class Drawable(
+                @DrawableRes
+                val iconRes: Int
+            ) : MainIcon
+        }
+    }
+
+    interface Effect {
+        object ShowBeat : Effect
+    }
     private val _commands = Channel<Command>()
 
     val state: Flow<UiState?> = produceState()
