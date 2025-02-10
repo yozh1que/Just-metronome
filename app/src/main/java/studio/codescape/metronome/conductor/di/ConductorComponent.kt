@@ -14,6 +14,7 @@ import studio.codescape.metronome.common.di.IoDispatcher
 import studio.codescape.metronome.conductor.application.repository.SettingsRepository
 import studio.codescape.metronome.conductor.application.repository.SettingsRepositoryDataStoreImpl
 import studio.codescape.metronome.conductor.domain.model.Conductor
+import studio.codescape.metronome.conductor.domain.usecase.settings.GetConductorSettings
 import kotlin.coroutines.CoroutineContext
 
 typealias ConductorStorageFileName = String
@@ -32,6 +33,7 @@ abstract class ConductorComponent(
 ) : ConductorSettings.RepositoryComponent {
 
     abstract val conductor: Conductor
+    abstract val getConductorSettings: GetConductorSettings
 
     private companion object {
         private const val DEFAULT_DATA_STORE_FILE_NAME = "conductor settings"

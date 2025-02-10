@@ -41,6 +41,7 @@ class ApplicationTest : StateHolderTest<Application>() {
             advanceUntilIdle()
 
             expectValues(
+                Application.State.Loading,
                 Application.State.Idle(mockAppComponent),
                 Application.State.Session(
                     appComponent = mockAppComponent,

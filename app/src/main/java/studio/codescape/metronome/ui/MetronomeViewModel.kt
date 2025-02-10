@@ -7,8 +7,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -18,24 +17,19 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import studio.codescape.metronome.R
-import studio.codescape.metronome.conductor.domain.model.Conductor.State
 import studio.codescape.metronome.conductor.domain.model.settings.Settings
-import studio.codescape.metronome.conductor.domain.usecase.GetBeat
-import studio.codescape.metronome.conductor.domain.usecase.GetConductorState
-import studio.codescape.metronome.conductor.domain.usecase.settings.GetConductorSettings
+import studio.codescape.metronome.domain.model.Metronome
 import timber.log.Timber
 
 class MetronomeViewModel(
-    private val getConductorState: GetConductorState,
-    private val getConductorSettings: GetConductorSettings,
-    private val getBeat: GetBeat,
+    private val metronome: Metronome
 ) : ViewModel() {
 
     sealed interface Command {
         data object Retry : Command
     }
 
-    data class UiState(
+    data class State(
         val mainIcon: MainIcon,
         val beatsPerMinuteLabel: String
     ) {
@@ -53,35 +47,34 @@ class MetronomeViewModel(
     interface Effect {
         object ShowBeat : Effect
     }
+
     private val _commands = Channel<Command>()
 
-    val state: Flow<UiState?> = produceState()
+    val state: Flow<State?> = produceState()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = loadingUiState
+            initialValue = LOADING_STATE
         )
-        .filter { it != loadingUiState }
 
     val effects: Flow<Effect> = produceEffects()
-        .shareIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed()
-        )
 
     private fun produceState() = getInitIntents()
         .flatMapLatest {
-            combine<State, Settings, UiState?>(
-                getConductorState(),
-                getConductorSettings()
-            ) { state, settings ->
-                UiState(
-                    mainIcon = when (state) {
-                        is State.Paused -> UiState.MainIcon.Drawable(R.drawable.ic_play_circle_outline_24)
-                        is State.Resumed -> UiState.MainIcon.Drawable(R.drawable.ic_pause_circle_outline_24)
-//                        State.Loading -> UiState.MainIcon.IndeterminateProgress
+            metronome.state.map<Metronome.State, State?> { metronomeState ->
+//                when (metronomeState) {
+//                    Metronome.State.Loading -> State.MainIcon.IndeterminateProgress
+//                    is Metronome.State.Ready.Paused -> TODO()
+//                    is Metronome.State.Ready.Resumed -> TODO()
+//                }
+                State(
+                    mainIcon = when (metronomeState) {
+                        is Metronome.State.Ready.Paused -> State.MainIcon.Drawable(R.drawable.ic_play_circle_outline_24)
+                        is Metronome.State.Ready.Resumed -> State.MainIcon.Drawable(R.drawable.ic_pause_circle_outline_24)
+                        else -> State.MainIcon.IndeterminateProgress
                     },
-                    beatsPerMinuteLabel = settings.beatsPerMinuteLabel
+                    beatsPerMinuteLabel = metronomeState.settings?.conductorSettings?.beatsPerMinuteLabel
+                        ?: ""
                 )
 
             }
@@ -94,7 +87,7 @@ class MetronomeViewModel(
 
     private fun produceEffects() =
         getInitIntents().flatMapLatest {
-            getBeat()
+            metronome.beats
                 .map { Effect.ShowBeat }
                 .catch { e ->
                     Timber.e(e, "Metronome beat collection failed.")
@@ -115,8 +108,8 @@ class MetronomeViewModel(
     private val Settings.beatsPerMinuteLabel: String
         get() = "$beatsPerMinute"
 
-    private companion object {
-        private val loadingUiState = UiState(mainIcon = UiState.MainIcon.IndeterminateProgress, "")
+    internal companion object {
+        internal val LOADING_STATE = State(mainIcon = State.MainIcon.IndeterminateProgress, "")
     }
 }
 

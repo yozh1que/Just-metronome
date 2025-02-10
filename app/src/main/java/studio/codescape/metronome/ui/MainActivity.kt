@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import studio.codescape.metronome.getMetronomeApplication
+import studio.codescape.metronome.ui.theme.JustMetronomeTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -12,10 +12,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            applicationContext
-                .getMetronomeApplication()
-                .state
-            Metronome()
+            JustMetronomeTheme {
+                JustMetronome()
+            }
         }
     }
 }

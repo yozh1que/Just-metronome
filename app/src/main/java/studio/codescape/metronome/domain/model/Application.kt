@@ -6,16 +6,17 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import studio.codescape.metronome.di.AppComponent
+import studio.codescape.metronome.di.AppScope
 import studio.codescape.metronome.di.SessionComponent
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
+@AppScope
 class Application(
     parentCoroutineContext: CoroutineContext = EmptyCoroutineContext,
     createAppComponent: () -> AppComponent,
@@ -28,9 +29,14 @@ class Application(
         data object Stop : Command
     }
 
+    // TODO: refactor
     sealed interface State {
 
-        val appComponent: AppComponent
+        val appComponent: AppComponent?
+
+        data object Loading : State {
+            override val appComponent = null
+        }
 
         data class Idle(
             override val appComponent: AppComponent
@@ -60,6 +66,8 @@ class Application(
         .scan<Command, State>(State.Idle(createAppComponent())) { state, command ->
             when (command) {
                 Command.Start -> if (state is State.Idle) {
+
+                    // TODO: refactor
                     State.Session(
                         index = 0,
                         appComponent = state.appComponent,
@@ -80,11 +88,13 @@ class Application(
                     state
                 }
 
-                Command.Stop -> State.Idle(state.appComponent)
+                Command.Stop -> when(state) {
+                    is State.Session -> State.Idle(state.appComponent)
+                    else -> state
+                }
             }
         }
-        .stateIn(this, SharingStarted.Lazily, null)
-        .filterNotNull()
+        .stateIn(this, SharingStarted.Lazily, State.Loading)
 
 
     fun handleCommand(command: Command) {

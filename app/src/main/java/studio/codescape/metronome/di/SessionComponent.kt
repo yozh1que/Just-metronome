@@ -28,8 +28,14 @@ abstract class SessionComponent(
 
     @SessionScope
     @Provides
-    internal fun metronome(conductorComponent: ConductorComponent): Metronome = Metronome(
-        conductorComponent.conductor
+    internal fun metronome(
+        conductorComponent: ConductorComponent,
+        sessionCoroutineScope: SessionCoroutineScope,
+
+    ): Metronome = Metronome(
+        conductorComponent.conductor,
+        conductorComponent.getConductorSettings,
+        sessionCoroutineScope.coroutineContext
     )
 
     @SessionScope
