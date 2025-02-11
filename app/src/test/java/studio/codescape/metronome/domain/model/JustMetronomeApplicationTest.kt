@@ -1,4 +1,4 @@
-package studio.codescape.metronome
+package studio.codescape.metronome.domain.model
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -8,7 +8,6 @@ import org.mockito.Mock
 import org.mockito.kotlin.whenever
 import studio.codescape.metronome.di.AppComponent
 import studio.codescape.metronome.di.SessionComponent
-import studio.codescape.metronome.domain.model.JustMetronomeApplication
 import studio.codescape.metronome.stub.coroutineDispatchers
 import studio.codescape.metronome.test.StateHolderTest
 import studio.codescape.metronome.test.observer.observe
@@ -56,7 +55,5 @@ class JustMetronomeApplicationTest : StateHolderTest<JustMetronomeApplication>()
                 )
             )
         }
-
-
     }
 }

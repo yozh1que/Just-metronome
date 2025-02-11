@@ -1,4 +1,4 @@
-package studio.codescape.metronome.domain.model
+package studio.codescape.metronome.conductor.domain.model
 
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
@@ -8,10 +8,6 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import studio.codescape.metronome.conductor.domain.model.Conductor
-import studio.codescape.metronome.conductor.domain.model.Conductor.Command
-import studio.codescape.metronome.conductor.domain.model.Conductor.Effect
-import studio.codescape.metronome.conductor.domain.model.Conductor.State
 import studio.codescape.metronome.conductor.domain.model.settings.Settings
 import studio.codescape.metronome.conductor.domain.usecase.settings.SettingsInteractor
 import studio.codescape.metronome.test.StateHolderTest
@@ -39,7 +35,7 @@ class ConductorTest : StateHolderTest<Conductor>() {
     fun `initially idle`() = runStateHolderTest { metronome ->
         metronome.state.observe {
             advanceUntilIdle()
-            expectValues(State.Paused)
+            expectValues(Conductor.State.Paused)
         }
     }
 
@@ -48,11 +44,11 @@ class ConductorTest : StateHolderTest<Conductor>() {
         runStateHolderTest { metronome ->
             metronome.state.observe {
                 advanceUntilIdle()
-                metronome.handleCommand(Command.Toggle)
+                metronome.handleCommand(Conductor.Command.Toggle)
                 advanceUntilIdle()
                 expectValues(
-                    State.Paused,
-                    State.Resumed
+                    Conductor.State.Paused,
+                    Conductor.State.Resumed
                 )
             }
         }
@@ -65,11 +61,11 @@ class ConductorTest : StateHolderTest<Conductor>() {
             metronome.effects.observe {
                 advanceUntilIdle()
 
-                metronome.handleCommand(Command.Toggle)
+                metronome.handleCommand(Conductor.Command.Toggle)
 
                 repeat(5) { iter ->
                     advanceTimeFor1Beat()
-                    expectValues(*(0..iter).map { Effect.Beat }.toTypedArray())
+                    expectValues(*(0..iter).map { Conductor.Effect.Beat }.toTypedArray())
                 }
                 verify(mockSettingsInteractor).settings
             }
