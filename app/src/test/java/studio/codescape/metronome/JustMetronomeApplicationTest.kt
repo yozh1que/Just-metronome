@@ -8,12 +8,13 @@ import org.mockito.Mock
 import org.mockito.kotlin.whenever
 import studio.codescape.metronome.di.AppComponent
 import studio.codescape.metronome.di.SessionComponent
-import studio.codescape.metronome.domain.model.Application
+import studio.codescape.metronome.domain.model.JustMetronomeApplication
+import studio.codescape.metronome.stub.coroutineDispatchers
 import studio.codescape.metronome.test.StateHolderTest
 import studio.codescape.metronome.test.observer.observe
 import kotlin.coroutines.CoroutineContext
 
-class ApplicationTest : StateHolderTest<Application>() {
+class JustMetronomeApplicationTest : StateHolderTest<JustMetronomeApplication>() {
 
     @Mock
     private lateinit var mockAppComponent: AppComponent
@@ -21,11 +22,12 @@ class ApplicationTest : StateHolderTest<Application>() {
     @Mock
     private lateinit var mockSessionComponent: SessionComponent
 
-    override fun createStateHolder(parentCoroutineContext: CoroutineContext): Application =
-        Application(
+    override fun createStateHolder(parentCoroutineContext: CoroutineContext): JustMetronomeApplication =
+        JustMetronomeApplication(
             parentCoroutineContext = parentCoroutineContext,
+            coroutineDispatchers = parentCoroutineContext.coroutineDispatchers(),
             createAppComponent = { mockAppComponent },
-            createSessionComponent = { _, _-> mockSessionComponent }
+            createSessionComponent = { _, _ -> mockSessionComponent }
         )
 
     @Test
@@ -35,19 +37,19 @@ class ApplicationTest : StateHolderTest<Application>() {
 
         app.state.observe {
             advanceUntilIdle()
-            app.handleCommand(Application.Command.Start)
+            app.handleCommand(JustMetronomeApplication.Command.StartSession)
             advanceUntilIdle()
             sessionScope.launch { throw RuntimeException() }
             advanceUntilIdle()
 
             expectValues(
-                Application.State.Loading,
-                Application.State.Idle(mockAppComponent),
-                Application.State.Session(
+                JustMetronomeApplication.State.Loading,
+                JustMetronomeApplication.State.Ready.AppReady(mockAppComponent),
+                JustMetronomeApplication.State.Ready.SessionReady(
                     appComponent = mockAppComponent,
                     sessionComponent = mockSessionComponent
                 ),
-                Application.State.Session(
+                JustMetronomeApplication.State.Ready.SessionReady(
                     index = 1,
                     appComponent = mockAppComponent,
                     sessionComponent = mockSessionComponent

@@ -18,21 +18,20 @@ annotation class AppScope
 @Component
 abstract class AppComponent(
     @get:Provides
-    val applicationContext: Context
+    val applicationContext: Context,
+    @get:Provides
+    val coroutineDispatchers: CoroutineDispatchers
 ) : CoroutineDispatcherComponent
 
 interface CoroutineDispatcherComponent {
 
-
-    val dispatchers: CoroutineDispatchers
+    @Provides
+    fun io(coroutineDispatchers: CoroutineDispatchers): IoDispatcher = coroutineDispatchers.io
 
     @Provides
-    fun io(): IoDispatcher = Dispatchers.IO
+    fun computation(coroutineDispatchers: CoroutineDispatchers): ComputationDispatcher = coroutineDispatchers.computation
 
     @Provides
-    fun computation(): ComputationDispatcher = Dispatchers.Default
-
-    @Provides
-    fun main(): MainDispatcher = Dispatchers.Main
+    fun main(coroutineDispatchers: CoroutineDispatchers): MainDispatcher = coroutineDispatchers.main
 }
 
