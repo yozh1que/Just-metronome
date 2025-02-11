@@ -3,6 +3,10 @@
 
 Well.. this small project strives to do just what its name implies keeping aforementioned memberberries in mind.
 
+### TODO
+- [ ] Android app
+- [ ] iOS app
+- [ ] WearOS app
 ### Assets
 * **Sound**: [Rimshot](https://freesound.org/people/Sajmund/sounds/132417/), [Claive](https://freesound.org/people/Sajmund/sounds/132418/), [Ping](https://freesound.org/people/jolup123/sounds/668790/) (courtesy of freesound.org)
 
