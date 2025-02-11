@@ -8,6 +8,7 @@ import me.tatarka.inject.annotations.Scope
 import studio.codescape.metronome.conductor.di.ConductorComponent
 import studio.codescape.metronome.conductor.di.create
 import studio.codescape.metronome.domain.model.Metronome
+import studio.codescape.metronome.ui.MetronomeScreen
 import kotlin.coroutines.CoroutineContext
 
 @Scope
@@ -21,17 +22,16 @@ typealias SessionCoroutineScope = CoroutineScope
 abstract class SessionComponent(
     @Component val appComponent: AppComponent,
     @get:Provides val parentCoroutineContext: CoroutineContext,
-) {
+) : MetronomeUiComponent {
 
     abstract val metronome: Metronome
     abstract val sessionCoroutineScope: SessionCoroutineScope
 
     @SessionScope
     @Provides
-    internal fun metronome(
+    fun metronome(
         conductorComponent: ConductorComponent,
         sessionCoroutineScope: SessionCoroutineScope,
-
     ): Metronome = Metronome(
         conductorComponent.conductor,
         conductorComponent.getConductorSettings,
@@ -53,4 +53,8 @@ abstract class SessionComponent(
         parentCoroutineContext = sessionCoroutineScope.coroutineContext
     )
 
+}
+
+interface MetronomeUiComponent {
+    val metronomeScreen: MetronomeScreen
 }

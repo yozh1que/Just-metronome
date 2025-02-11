@@ -42,7 +42,7 @@ class JustMetronomeApplicationTest : StateHolderTest<JustMetronomeApplication>()
             advanceUntilIdle()
 
             expectValues(
-                JustMetronomeApplication.State.Loading,
+                JustMetronomeApplication.State.Initializing,
                 JustMetronomeApplication.State.Ready.AppReady(mockAppComponent),
                 JustMetronomeApplication.State.Ready.SessionReady(
                     appComponent = mockAppComponent,

@@ -7,20 +7,22 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import me.tatarka.inject.annotations.Inject
 import studio.codescape.metronome.R
 import studio.codescape.metronome.conductor.domain.model.settings.Settings
+import studio.codescape.metronome.di.SessionScope
 import studio.codescape.metronome.domain.model.Metronome
 import timber.log.Timber
 
+@SessionScope
+@Inject
 class MetronomeViewModel(
     private val metronome: Metronome
 ) : ViewModel() {
@@ -48,9 +50,9 @@ class MetronomeViewModel(
         object ShowBeat : Effect
     }
 
-    private val _commands = Channel<Command>()
+    private val commands = Channel<Command>()
 
-    val state: Flow<State?> = produceState()
+    val state = produceState()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
@@ -61,12 +63,7 @@ class MetronomeViewModel(
 
     private fun produceState() = getInitIntents()
         .flatMapLatest {
-            metronome.state.map<Metronome.State, State?> { metronomeState ->
-//                when (metronomeState) {
-//                    Metronome.State.Loading -> State.MainIcon.IndeterminateProgress
-//                    is Metronome.State.Ready.Paused -> TODO()
-//                    is Metronome.State.Ready.Resumed -> TODO()
-//                }
+            metronome.state.map { metronomeState ->
                 State(
                     mainIcon = when (metronomeState) {
                         is Metronome.State.Ready.Paused -> State.MainIcon.Drawable(R.drawable.ic_play_circle_outline_24)
@@ -78,10 +75,10 @@ class MetronomeViewModel(
                 )
 
             }
-                .catch { e ->
-                    Timber.e(e, "Metronome state collection failed.")
-                    emit(null)
-                }
+//                .catch { e ->
+//                    Timber.e(e, "Metronome state collection failed.")
+//                    emit(null)
+//                }
         }
 
 
@@ -94,14 +91,14 @@ class MetronomeViewModel(
                 }
         }
 
-    private fun getInitIntents() = _commands
+    private fun getInitIntents() = commands
         .receiveAsFlow()
         .mapNotNull { command -> Unit.takeIf { command == Command.Retry } }
         .onStart { emit(Unit) }
 
     fun handleCommand(command: Command) {
         viewModelScope.launch {
-            _commands.send(command)
+            commands.send(command)
         }
     }
 

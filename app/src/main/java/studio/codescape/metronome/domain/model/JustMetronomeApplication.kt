@@ -35,7 +35,7 @@ class JustMetronomeApplication(
 
     sealed interface State {
 
-        data object Loading : State
+        data object Initializing : State
 
         sealed interface Ready : State {
             val appComponent: AppComponent
@@ -56,17 +56,17 @@ class JustMetronomeApplication(
         }
     }
 
-    private val commands = Channel<Command>()
-
     override val coroutineContext: CoroutineContext =
         parentCoroutineContext + SupervisorJob() + CoroutineExceptionHandler { context, throwable ->
             handleCommand(Command.RestartSession)
         }
 
+    private val commands = Channel<Command>()
+
     val state = commands
         .receiveAsFlow()
         .onStart { emit(Command.Load) }
-        .scan<Command, State>(State.Loading) { state, command ->
+        .scan<Command, State>(State.Initializing) { state, command ->
             when (command) {
                 Command.Load -> State.Ready.AppReady(
                     createAppComponent(coroutineDispatchers)
@@ -89,7 +89,7 @@ class JustMetronomeApplication(
         .stateIn(
             this,
             SharingStarted.Lazily,
-            State.Loading
+            State.Initializing
         )
 
     private fun State.Ready.toSessionReady(index: Int = 0) =  State.Ready.SessionReady(

@@ -44,6 +44,8 @@ class Metronome(
         }
     }
 
+    override val coroutineContext: CoroutineContext = parentCoroutineContext + Job()
+
     val state: Flow<State> = combine(
         conductor.state,
         getConductorSettings()
@@ -62,9 +64,6 @@ class Metronome(
 
     val beats = conductor.effects
         .map { }
-
-
-    override val coroutineContext: CoroutineContext = parentCoroutineContext + Job()
 
 }
 

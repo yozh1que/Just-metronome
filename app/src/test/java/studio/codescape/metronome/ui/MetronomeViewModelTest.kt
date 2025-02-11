@@ -3,7 +3,6 @@ package studio.codescape.metronome.ui
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -56,22 +55,23 @@ class MetronomeViewModelTest : StateHolderTest<MetronomeViewModel>() {
         }
     }
 
-    @Test
-    fun `converts state collection errors turning state to null`() =
-        runStateHolderTest { viewModel ->
-            whenever(mockMetronome.state).thenReturn(flow { throw RuntimeException() })
+// TODO: remove?
+//    @Test
+//    fun `converts state collection errors turning state to null`() =
+//        runStateHolderTest { viewModel ->
+//            whenever(mockMetronome.state).thenReturn(flow { throw RuntimeException() })
+//
+//            viewModel.state.observe {
+//                advanceUntilIdle()
+//
+//                expectValues(
+//                    MetronomeViewModel.LOADING_STATE,
+//                    null
+//                )
+//            }
+//        }
 
-            viewModel.state.observe {
-                advanceUntilIdle()
-
-                expectValues(
-                    MetronomeViewModel.LOADING_STATE,
-                    null
-                )
-            }
-        }
-
-// TODO: restore
+// TODO: restore?
 //    @Test
 //    fun `retries state collection on request`() = runStateHolderTest { viewModel ->
 //        whenever(mockMetronome.state).thenReturn(flow { throw RuntimeException() })
