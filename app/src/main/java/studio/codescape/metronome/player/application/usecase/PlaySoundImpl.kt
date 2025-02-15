@@ -1,11 +1,13 @@
 package studio.codescape.metronome.player.application.usecase
 
 import androidx.media3.common.Player
-import studio.codescape.metronome.player.domain.usecase.PlayBeatSound
+import me.tatarka.inject.annotations.Inject
+import studio.codescape.metronome.player.domain.usecase.PlaySound
 
-class PlayBeatSoundImpl(
+@Inject
+class PlaySoundImpl(
     private val player: Player
-) : PlayBeatSound {
+) : PlaySound {
     override fun invoke() {
         player.seekToDefaultPosition()
         player.play()

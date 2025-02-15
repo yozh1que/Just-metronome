@@ -14,15 +14,22 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import me.tatarka.inject.annotations.Inject
+import studio.codescape.metronome.player.di.PlayerScope
+import studio.codescape.metronome.player.domain.model.settings.Settings
+import studio.codescape.metronome.player.domain.repository.SettingsRepository
 import studio.codescape.metronome.player.domain.usecase.GetSoundLoaded
-import studio.codescape.metronome.player.domain.usecase.PlayBeatSound
-import studio.codescape.metronome.player.domain.usecase.settings.SettingsInteractor
+import studio.codescape.metronome.player.domain.usecase.PlaySound
+import studio.codescape.metronome.player.domain.usecase.settings.GetPlayerSettings
 import kotlin.coroutines.CoroutineContext
 
+@PlayerScope
+@Inject
 class Player(
-    private val settingsInteractor: SettingsInteractor,
-    getSoundLoaded: GetSoundLoaded,
-    private val playBeatSound: PlayBeatSound,
+    private val getPlayerSettings: GetPlayerSettings,
+    private val settingsRepository: SettingsRepository,
+    private val getSoundLoaded: GetSoundLoaded,
+    private val playSound: PlaySound,
     parentCoroutineContext: CoroutineContext,
 ) : CoroutineScope {
 
@@ -34,42 +41,42 @@ class Player(
 
     sealed interface State {
 
-        val soundUri: String
+        val settings: Settings
 
         data class Loading(
-            override val soundUri: String
+            override val settings: Settings
         ) : State
 
         data class Ready(
-            override val soundUri: String
+            override val settings: Settings
         ) : State
 
         data class Failure(
-            override val soundUri: String
+            override val settings: Settings
         ) : State
     }
-    
+
     // splitting command channels to avoid suspending either of type subscribers due to high load
     private val playSoundCommands = Channel<Command.PlaySound>()
     private val setSoundCommands = Channel<Command.SetSound>()
 
     override val coroutineContext: CoroutineContext = parentCoroutineContext + Job()
 
-    val state: Flow<State> =
-        settingsInteractor
-            .settings
-            .flatMapLatest { settings ->
-                getSoundLoaded()
-                    .map<Unit, State> { State.Ready(settings.soundUri) }
-                    .onStart { emit(State.Loading(settings.soundUri)) }
-                    .catch { emit(State.Failure(settings.soundUri)) }
-            }
-            .stateIn(this, SharingStarted.Lazily, null)
-            .filterNotNull()
+    val state: Flow<State> = produceState()
+        .filterNotNull()
 
     init {
         produceSideEffects()
     }
+
+    private fun produceState() = getPlayerSettings()
+        .flatMapLatest { settings ->
+            getSoundLoaded()
+                .map<Unit, State> { State.Ready(settings) }
+                .onStart { emit(State.Loading(settings)) }
+                .catch { emit(State.Failure(settings)) }
+        }
+        .stateIn(this, SharingStarted.Lazily, null)
 
     private fun produceSideEffects() {
         playSoundBeats()
@@ -80,19 +87,18 @@ class Player(
         launch {
             setSoundCommands
                 .receiveAsFlow()
-                .collect { command ->
-                    settingsInteractor.setSoundUri(command.uri)
-                }
+                .map { command -> Settings(soundUri = command.uri) }
+                .collect(settingsRepository::set)
         }
     }
 
     private fun playSoundBeats() {
-        launch {
+        launch { // TODO: subsribe indirectly
             state
                 .filterIsInstance<State.Ready>()
                 .flatMapLatest { playSoundCommands.receiveAsFlow() }
                 .collect {
-                    playBeatSound()
+                    playSound()
                 }
         }
     }

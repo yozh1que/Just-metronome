@@ -5,10 +5,13 @@ import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.flow.Flow
 import me.tatarka.inject.annotations.Inject
 import studio.codescape.metronome.common.application.repository.PreferenceItemRepository
+import studio.codescape.metronome.player.di.PlayerScope
 import studio.codescape.metronome.player.domain.model.settings.Settings
+import studio.codescape.metronome.player.domain.repository.SettingsRepository
 import kotlin.reflect.typeOf
 
 @Inject
+@PlayerScope
 class SettingsRepositoryDataStoreImpl(
     dataStore: DataStore<Preferences>,
 ) : SettingsRepository {

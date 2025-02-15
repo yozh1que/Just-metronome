@@ -7,10 +7,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.suspendCancellableCoroutine
+import me.tatarka.inject.annotations.Inject
 import studio.codescape.metronome.player.domain.usecase.GetSoundLoaded
 import studio.codescape.metronome.player.domain.usecase.settings.GetPlayerSettings
 import kotlin.coroutines.resume
 
+@Inject
 class GetSoundLoadedImpl(
     private val player: Player,
     private val getPlayerSettings: GetPlayerSettings

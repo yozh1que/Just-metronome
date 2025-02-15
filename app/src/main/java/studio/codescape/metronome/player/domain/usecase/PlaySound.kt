@@ -1,5 +1,5 @@
 package studio.codescape.metronome.player.domain.usecase
 
-interface PlayBeatSound {
+interface PlaySound {
     operator fun invoke()
 }

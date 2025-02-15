@@ -11,7 +11,7 @@ import studio.codescape.metronome.conductor.domain.repository.SettingsRepository
 import studio.codescape.metronome.conductor.domain.usecase.settings.GetConductorSettings
 import studio.codescape.metronome.test.UnitTest
 
-class GetConductorSettingsTest : UnitTest() {
+class GetPlayerSettingsTest : UnitTest() {
 
     @Mock
     private lateinit var mockSettingsRepository: SettingsRepository

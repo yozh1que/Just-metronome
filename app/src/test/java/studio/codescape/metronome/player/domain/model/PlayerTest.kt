@@ -14,9 +14,10 @@ import org.mockito.kotlin.whenever
 import studio.codescape.metronome.player.domain.model.Player.Command
 import studio.codescape.metronome.player.domain.model.Player.State
 import studio.codescape.metronome.player.domain.model.settings.Settings
+import studio.codescape.metronome.player.domain.repository.SettingsRepository
 import studio.codescape.metronome.player.domain.usecase.GetSoundLoaded
-import studio.codescape.metronome.player.domain.usecase.PlayBeatSound
-import studio.codescape.metronome.player.domain.usecase.settings.SettingsInteractor
+import studio.codescape.metronome.player.domain.usecase.PlaySound
+import studio.codescape.metronome.player.domain.usecase.settings.GetPlayerSettings
 import studio.codescape.metronome.test.StateHolderTest
 import studio.codescape.metronome.test.observer.observe
 import kotlin.coroutines.CoroutineContext
@@ -24,26 +25,31 @@ import kotlin.coroutines.CoroutineContext
 class PlayerTest : StateHolderTest<Player>() {
 
     @Mock
+    private lateinit var mockSettingsRepository: SettingsRepository
+
+    @Mock
+    private lateinit var mockGetPlayerSettings: GetPlayerSettings
+
+    @Mock
     private lateinit var mockGetSoundLoaded: GetSoundLoaded
 
     @Mock
-    private lateinit var mockPlayBeatSound: PlayBeatSound
+    private lateinit var mockPlaySound: PlaySound
 
-    @Mock
-    private lateinit var mockSettingsInteractor: SettingsInteractor
 
     override fun createStateHolder(parentCoroutineContext: CoroutineContext): Player = Player(
-        mockSettingsInteractor,
+        mockGetPlayerSettings,
+        mockSettingsRepository,
         mockGetSoundLoaded,
-        mockPlayBeatSound,
+        mockPlaySound,
         parentCoroutineContext
     )
 
     @Before
     override fun before() {
         super.before()
-        whenever(mockSettingsInteractor.settings).thenReturn(flowOf(stubSettings))
-        doNothing().whenever(mockPlayBeatSound).invoke()
+        whenever(mockGetPlayerSettings.invoke()).thenReturn(flowOf(stubSettings))
+        doNothing().whenever(mockPlaySound).invoke()
     }
 
     @Test
@@ -57,8 +63,8 @@ class PlayerTest : StateHolderTest<Player>() {
             advanceUntilIdle()
 
             expectValues(
-                State.Loading(stubSoundUri),
-                State.Ready(stubSoundUri)
+                State.Loading(stubSettings),
+                State.Ready(stubSettings)
             )
         }
     }
@@ -74,7 +80,7 @@ class PlayerTest : StateHolderTest<Player>() {
 
             advanceUntilIdle()
 
-            verify(mockPlayBeatSound).invoke()
+            verify(mockPlaySound).invoke()
         }
     }
 
