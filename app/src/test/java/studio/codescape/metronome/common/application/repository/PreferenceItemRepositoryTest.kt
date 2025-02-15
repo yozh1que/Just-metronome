@@ -1,4 +1,4 @@
-package studio.codescape.metronome.application.repository
+package studio.codescape.metronome.common.application.repository
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.preferencesDataStoreFile
@@ -9,36 +9,37 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
-import studio.codescape.metronome.conductor.application.repository.SettingsRepositoryDataStoreImpl
 import studio.codescape.metronome.conductor.domain.model.settings.Settings
 import studio.codescape.metronome.test.StateHolderTest
 import studio.codescape.metronome.test.observer.observe
 import kotlin.coroutines.CoroutineContext
+import kotlin.reflect.typeOf
 
 @RunWith(RobolectricTestRunner::class)
-class SettingsRepositoryDataStoreImplTest : StateHolderTest<SettingsRepositoryDataStoreImpl>() {
+class PreferenceItemRepositoryTest : StateHolderTest<PreferenceItemRepository<Settings>>() {
 
-    override fun createStateHolder(parentCoroutineContext: CoroutineContext): SettingsRepositoryDataStoreImpl {
+    override fun createStateHolder(parentCoroutineContext: CoroutineContext): PreferenceItemRepository<Settings> {
         val datastore = PreferenceDataStoreFactory.create(
             scope = CoroutineScope(parentCoroutineContext)
         ) {
             RuntimeEnvironment.getApplication().preferencesDataStoreFile(DATA_STORE_FILE_NAME)
         }
-        return SettingsRepositoryDataStoreImpl(
-            datastore
+        return PreferenceItemRepository(
+            datastore,
+            key = SETTING_KEY,
+            type = typeOf<Settings>()
         )
     }
 
-
     @Test
-    fun `stores conductor settings`() = runStateHolderTest { repository ->
-        repository.settings.observe {
+    fun `stores values`() = runStateHolderTest { repository ->
+        repository.values.observe {
             advanceUntilIdle()
             launch { repository.set(STUB_SETTINGS) }
             advanceUntilIdle()
 
             expectValues(
-                null,
+                null, // initially empty
                 STUB_SETTINGS,
             )
         }
@@ -46,7 +47,7 @@ class SettingsRepositoryDataStoreImplTest : StateHolderTest<SettingsRepositoryDa
 
     private companion object {
         private const val DATA_STORE_FILE_NAME = "METRONOME_STORAGE"
-
+        private const val SETTING_KEY = "conductor settings"
         private val STUB_SETTINGS = Settings(60)
     }
 

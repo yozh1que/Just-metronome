@@ -1,9 +1,9 @@
-package studio.codescape.metronome.player.application.repository
+package studio.codescape.metronome.player.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import studio.codescape.metronome.player.domain.model.settings.Settings
 
-interface PlayerSettingsRepository {
+interface SettingsRepository {
     val settings: Flow<Settings?>
 
     suspend fun set(settings: Settings)
