@@ -7,7 +7,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.kotlin.whenever
-import studio.codescape.metronome.conductor.application.repository.SettingsRepository
+import studio.codescape.metronome.conductor.domain.repository.SettingsRepository
 import studio.codescape.metronome.conductor.domain.usecase.settings.GetConductorSettings
 import studio.codescape.metronome.test.UnitTest
 

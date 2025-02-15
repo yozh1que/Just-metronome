@@ -1,4 +1,4 @@
-package studio.codescape.metronome.conductor.application.repository
+package studio.codescape.metronome.conductor.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import studio.codescape.metronome.conductor.domain.model.settings.Settings

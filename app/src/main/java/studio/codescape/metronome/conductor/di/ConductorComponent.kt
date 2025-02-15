@@ -11,7 +11,7 @@ import me.tatarka.inject.annotations.Component
 import me.tatarka.inject.annotations.Provides
 import me.tatarka.inject.annotations.Scope
 import studio.codescape.metronome.common.di.IoDispatcher
-import studio.codescape.metronome.conductor.application.repository.SettingsRepository
+import studio.codescape.metronome.conductor.domain.repository.SettingsRepository
 import studio.codescape.metronome.conductor.application.repository.SettingsRepositoryDataStoreImpl
 import studio.codescape.metronome.conductor.domain.model.Conductor
 import studio.codescape.metronome.conductor.domain.usecase.settings.GetConductorSettings
