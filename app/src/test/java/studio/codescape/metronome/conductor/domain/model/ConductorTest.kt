@@ -28,7 +28,7 @@ class ConductorTest : StateHolderTest<Conductor>() {
     @Before
     override fun before() {
         super.before()
-        whenever(mockSettingsInteractor.settings).thenReturn(flowOf(stubSettings))
+        whenever(mockSettingsInteractor.settings).thenReturn(flowOf(STUB_SETTINGS))
     }
 
     @Test
@@ -57,7 +57,7 @@ class ConductorTest : StateHolderTest<Conductor>() {
     fun `publishes metronome beats when running state is active`() =
         runStateHolderTest { metronome ->
             val oneMinuteMillis = 1000L * 60
-            fun advanceTimeFor1Beat() = advanceTimeBy(oneMinuteMillis / stubSettings.beatsPerMinute)
+            fun advanceTimeFor1Beat() = advanceTimeBy(oneMinuteMillis / STUB_SETTINGS.beatsPerMinute)
             metronome.effects.observe {
                 advanceUntilIdle()
 
@@ -72,7 +72,7 @@ class ConductorTest : StateHolderTest<Conductor>() {
         }
 
     private companion object {
-        private val stubSettings = Settings(
+        private val STUB_SETTINGS = Settings(
             beatsPerMinute = 60
         )
     }

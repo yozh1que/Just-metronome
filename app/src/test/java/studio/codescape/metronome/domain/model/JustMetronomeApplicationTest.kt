@@ -8,7 +8,7 @@ import org.mockito.Mock
 import org.mockito.kotlin.whenever
 import studio.codescape.metronome.di.AppComponent
 import studio.codescape.metronome.di.SessionComponent
-import studio.codescape.metronome.stub.coroutineDispatchers
+import studio.codescape.metronome.test.coroutineDispatchers
 import studio.codescape.metronome.test.StateHolderTest
 import studio.codescape.metronome.test.observer.observe
 import kotlin.coroutines.CoroutineContext

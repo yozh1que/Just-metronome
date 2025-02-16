@@ -1,4 +1,5 @@
 package studio.codescape.metronome.domain.model
-class Settings(
+
+data class Settings(
     val conductorSettings: ConductorSettings
 )

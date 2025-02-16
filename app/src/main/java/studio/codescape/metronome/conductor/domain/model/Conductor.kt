@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
 import studio.codescape.metronome.conductor.di.ConductorScope
 import studio.codescape.metronome.conductor.domain.usecase.settings.SettingsInteractor
-import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 @Inject
@@ -58,17 +57,14 @@ class Conductor(
 
     init {
         state = produceState()
-            .stateIn(this, SharingStarted.Eagerly, initialState)
+            .stateIn(this, SharingStarted.Eagerly, INITIAL_STATE)
         effects = produceEffects()
     }
 
-    private fun produceState(): Flow<State> =
-        produceReadyState()
-
-    private fun produceReadyState() = commands
+    private fun produceState(): Flow<State> = commands
         .receiveAsFlow()
         .filter { command -> command == Command.Toggle }
-        .scan<Command, State>(initialState) { currentState, _ ->
+        .scan<Command, State>(INITIAL_STATE) { currentState, _ ->
             State.Paused.takeIf { currentState is State.Resumed } ?: State.Resumed
         }
 
@@ -80,9 +76,8 @@ class Conductor(
                     .flatMapLatest { settings ->
                         flow {
                             while (isActive) {
-                                Timber.d("DEBUG_BEAT, emit")
                                 emit(Effect.Beat)
-                                delay(oneMinuteMillis / settings.beatsPerMinute)
+                                delay(ONE_MINUTE_MILLIS / settings.beatsPerMinute)
                             }
                         }
                     }
@@ -99,8 +94,8 @@ class Conductor(
     }
 
     private companion object {
-        private val initialState = State.Paused
-        private const val oneMinuteMillis = 1000L * 60
+        private val INITIAL_STATE = State.Paused
+        private const val ONE_MINUTE_MILLIS = 1000L * 60
     }
 
 }

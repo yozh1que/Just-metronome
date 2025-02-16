@@ -1,4 +1,4 @@
-package studio.codescape.metronome.stub
+package studio.codescape.metronome.test
 
 import kotlinx.coroutines.CoroutineDispatcher
 import studio.codescape.metronome.common.di.CoroutineDispatchers

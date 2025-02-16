@@ -28,6 +28,8 @@ typealias PlayerStorageFileName = String
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER)
 annotation class PlayerScope
 
+typealias GetMediaPlayer = (context: Context) -> androidx.media3.common.Player
+
 @PlayerScope
 @Component
 abstract class PlayerComponent(
@@ -35,6 +37,7 @@ abstract class PlayerComponent(
     @get:Provides val ioDispatcher: IoDispatcher = Dispatchers.IO,
     @get:Provides val parentCoroutineContext: CoroutineContext,
     @get:Provides val storageFileName: PlayerStorageFileName = DEFAULT_DATA_STORE_FILE_NAME,
+    @get:Provides val getMediaPlayer: GetMediaPlayer = ::getMediaPlayer
 ) : PlayerSettings {
 
     abstract val player: Player
@@ -46,10 +49,15 @@ abstract class PlayerComponent(
 
     @Provides
     @PlayerScope
-    internal fun mediaPlayer(context: Context): androidx.media3.common.Player = ExoPlayer.Builder(context).build()
+    internal fun mediaPlayer(
+        context: Context,
+        getMediaPlayer: GetMediaPlayer
+    ): androidx.media3.common.Player = getMediaPlayer(context)
 
-    private companion object {
-        private const val DEFAULT_DATA_STORE_FILE_NAME = "player settings"
+     companion object {
+        const val DEFAULT_DATA_STORE_FILE_NAME = "player settings"
+        fun getMediaPlayer(context: Context): androidx.media3.common.Player =
+            ExoPlayer.Builder(context).build()
     }
 }
 
