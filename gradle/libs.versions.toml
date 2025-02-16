@@ -3,7 +3,6 @@
 agp = "8.8.0"
 ksp = "2.1.10-1.0.29"
 
-
 #library versions
 kotlin = "2.1.10"
 coreKtx = "1.15.0"
@@ -15,7 +14,10 @@ composeBom = "2025.02.00"
 navigation = "2.8.6"
 coroutines = "1.10.1"
 datastore = "1.1.2"
+kotlinxSerialization = "1.7.1"
 media3 = "1.5.1"
+timber = "5.0.1"
+mockito = "5.4.0"
 robolectric = "4.14.1"
 
 [libraries]
@@ -25,7 +27,6 @@ coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core"
 # di
 kotlin-inject-compiler = { group = "me.tatarka.inject", name = "kotlin-inject-compiler-ksp", version.ref = "kotlinInject" }
 kotlin-inject-runtime = { group = "me.tatarka.inject", name = "kotlin-inject-runtime", version.ref = "kotlinInject" }
-
 
 # ui
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
@@ -43,24 +44,20 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 # media
 androidx-media3-player = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3" }
 androidx-media3-test-utils = { group = "androidx.media3", name = "media3-test-utils", version.ref = "media3" }
-androidx-media3-test-utils-robolectric = { group = "androidx.media3", name = "media3-test-utils-robolectric", version.ref = "media3" }
-
 
 # persistence
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.7.1" }
-
+serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 
 # testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
-mockito = { group = "org.mockito.kotlin", name = "mockito-kotlin", version = "5.4.0" }
+mockito = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockito" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
-
+androidx-media3-test-utils-robolectric = { group = "androidx.media3", name = "media3-test-utils-robolectric", version.ref = "media3" }
 
 # logging
-logging-console = { group = "com.jakewharton.timber", name = "timber", version = "5.0.1" }
-
+logging-console = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
