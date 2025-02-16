@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import me.tatarka.inject.annotations.Component
 import me.tatarka.inject.annotations.Provides
 import me.tatarka.inject.annotations.Scope
+import studio.codescape.metronome.common.di.CoroutineDispatchers
 import studio.codescape.metronome.conductor.di.ConductorComponent
 import studio.codescape.metronome.conductor.di.create
 import studio.codescape.metronome.domain.model.Metronome
@@ -19,7 +20,11 @@ annotation class SessionScope
 
 typealias SessionCoroutineScope = CoroutineScope
 
-typealias GetPlayerComponent = (context: Context, sessionCoroutineScope: SessionCoroutineScope) -> PlayerComponent
+typealias GetPlayerComponent = (
+    context: Context,
+    coroutineDispatchers: CoroutineDispatchers,
+    sessionCoroutineScope: SessionCoroutineScope
+) -> PlayerComponent
 
 @Component
 @SessionScope
@@ -64,16 +69,19 @@ abstract class SessionComponent(
     @Provides
     internal fun playerComponent(
         context: Context,
+        coroutineDispatchers: CoroutineDispatchers,
         sessionCoroutineScope: SessionCoroutineScope,
         getPlayerComponent: GetPlayerComponent
-    ): PlayerComponent = getPlayerComponent(context, sessionCoroutineScope)
+    ): PlayerComponent = getPlayerComponent(context, coroutineDispatchers, sessionCoroutineScope)
 
     companion object {
         internal fun getPlayerComponent(
             context: Context,
+            coroutineDispatchers: CoroutineDispatchers,
             sessionCoroutineScope: SessionCoroutineScope
         ): PlayerComponent = PlayerComponent::class.create(
-            context = context,
+            applicationContext = context,
+            coroutineDispatchers = coroutineDispatchers,
             parentCoroutineContext = sessionCoroutineScope.coroutineContext
         )
     }

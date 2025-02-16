@@ -3,6 +3,7 @@ package studio.codescape.metronome.ui
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,12 +20,16 @@ import studio.codescape.metronome.ui.theme.JustMetronomeTheme
 fun MetronomeScreen(getMetronomeViewModel: () -> MetronomeViewModel) {
     val viewModel = viewModel(getMetronomeViewModel)
     val state by viewModel.state.collectAsStateWithLifecycle()
-    MetronomeScreen(beatsPerMinute = state.beatsPerMinuteLabel)
+    MetronomeScreen(
+        onPlayPauseClick = { viewModel.handleCommand(MetronomeViewModel.Command.TogglePlayback) },
+        beatsPerMinute = state.beatsPerMinuteLabel,
+    )
 }
 
 @Composable
 private fun MetronomeScreen(
     modifier: Modifier = Modifier,
+    onPlayPauseClick: () -> Unit,
     beatsPerMinute: String,
 ) = Scaffold(modifier = modifier) { paddingValues ->
     Column(
@@ -33,6 +38,9 @@ private fun MetronomeScreen(
             .padding(paddingValues)
     ) {
         Text(beatsPerMinute)
+        Button(onClick = onPlayPauseClick) {
+            Text("Play/Pause")
+        }
     }
 }
 
@@ -40,6 +48,7 @@ private fun MetronomeScreen(
 @Composable
 private fun PreviewMetronomeScreen() = JustMetronomeTheme {
     MetronomeScreen(
+        onPlayPauseClick = {},
         beatsPerMinute = "120"
     )
 }

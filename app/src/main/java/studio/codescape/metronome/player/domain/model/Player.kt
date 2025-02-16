@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
+import studio.codescape.metronome.common.di.CoroutineDispatchers
 import studio.codescape.metronome.player.di.PlayerScope
 import studio.codescape.metronome.player.domain.model.settings.Settings
 import studio.codescape.metronome.player.domain.repository.SettingsRepository
@@ -30,6 +31,7 @@ class Player(
     private val settingsRepository: SettingsRepository,
     private val getSoundLoaded: GetSoundLoaded,
     private val playSound: PlaySound,
+    coroutineDispatchers: CoroutineDispatchers,
     parentCoroutineContext: CoroutineContext,
 ) : CoroutineScope {
 
@@ -60,7 +62,7 @@ class Player(
     private val playSoundCommands = Channel<Command.PlaySound>()
     private val setSoundCommands = Channel<Command.SetSound>()
 
-    override val coroutineContext: CoroutineContext = parentCoroutineContext + Job()
+    override val coroutineContext: CoroutineContext = parentCoroutineContext + coroutineDispatchers.main + Job()
 
     val state: Flow<State> = produceState()
         .filterNotNull()

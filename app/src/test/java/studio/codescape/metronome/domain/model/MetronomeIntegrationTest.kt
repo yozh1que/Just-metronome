@@ -33,11 +33,11 @@ class MetronomeIntegrationTest : StateHolderTest<Metronome>() {
         val sessionComponent = SessionComponent::class.create(
             appComponent = appComponent,
             parentCoroutineContext = parentCoroutineContext,
-            getPlayerComponent = { context, sessionCoroutineScope ->
+            getPlayerComponent = { context, coroutineDispatchers, sessionCoroutineScope ->
                 PlayerComponent::class.create(
-                    context = context,
+                    applicationContext = context,
                     parentCoroutineContext = sessionCoroutineScope.coroutineContext,
-                    ioDispatcher = appComponent.coroutineDispatchers.io,
+                    coroutineDispatchers = coroutineDispatchers,
                     storageFileName = PlayerComponent.DEFAULT_DATA_STORE_FILE_NAME,
                     getMediaPlayer = { context -> TestExoPlayerBuilder(context).build() }
                 )

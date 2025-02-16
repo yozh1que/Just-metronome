@@ -19,6 +19,7 @@ import studio.codescape.metronome.player.domain.usecase.GetSoundLoaded
 import studio.codescape.metronome.player.domain.usecase.PlaySound
 import studio.codescape.metronome.player.domain.usecase.settings.GetPlayerSettings
 import studio.codescape.metronome.test.StateHolderTest
+import studio.codescape.metronome.test.coroutineDispatchers
 import studio.codescape.metronome.test.observer.observe
 import kotlin.coroutines.CoroutineContext
 
@@ -42,6 +43,7 @@ class PlayerTest : StateHolderTest<Player>() {
         mockSettingsRepository,
         mockGetSoundLoaded,
         mockPlaySound,
+        parentCoroutineContext.coroutineDispatchers(),
         parentCoroutineContext
     )
 
