@@ -65,7 +65,7 @@ class PlayerTest : StateHolderTest<Player>() {
             advanceUntilIdle()
 
             expectValues(
-                State.Loading(stubSettings),
+                State.Loading,
                 State.Ready(stubSettings)
             )
         }

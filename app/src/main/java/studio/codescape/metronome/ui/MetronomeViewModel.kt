@@ -5,9 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
@@ -15,16 +14,18 @@ import studio.codescape.metronome.R
 import studio.codescape.metronome.conductor.domain.model.settings.Settings
 import studio.codescape.metronome.di.SessionScope
 import studio.codescape.metronome.domain.model.Metronome
+import studio.codescape.metronome.domain.usecase.settings.GetMetronomeSettings
 
 @SessionScope
 @Inject
 class MetronomeViewModel(
-    private val metronome: Metronome
+    private val metronome: Metronome,
+    private val getMetronomeSettings: GetMetronomeSettings
 ) : ViewModel() {
 
     sealed interface Command {
         data object TogglePlayback : Command
-//        data object Retry : Command
+        data class SetBeatsPerMinute(val value: Int) : Command
     }
 
     data class State(
@@ -49,7 +50,6 @@ class MetronomeViewModel(
     private val commands = MutableSharedFlow<Command>()
 
     val state = produceState()
-//        .onStart { metronome.handleCommand(,) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
@@ -61,16 +61,16 @@ class MetronomeViewModel(
     init {
         produceSideEffects()
     }
+
     private fun produceState() =
-        metronome.state.map { metronomeState ->
+        combine(metronome.state, getMetronomeSettings()) { state, settings  ->
             State(
-                mainIcon = when (metronomeState) {
-                    is Metronome.State.Ready.Paused -> State.MainIcon.Drawable(R.drawable.ic_play_circle_outline_24)
-                    is Metronome.State.Ready.Resumed -> State.MainIcon.Drawable(R.drawable.ic_pause_circle_outline_24)
+                mainIcon = when (state) {
+                    is Metronome.State.Paused -> State.MainIcon.Drawable(R.drawable.ic_play_circle_outline_24)
+                    is Metronome.State.Resumed -> State.MainIcon.Drawable(R.drawable.ic_pause_circle_outline_24)
                     else -> State.MainIcon.IndeterminateProgress
                 },
-                beatsPerMinuteLabel = metronomeState.settings?.conductorSettings?.beatsPerMinuteLabel
-                    ?: ""
+                beatsPerMinuteLabel = settings.conductorSettings.beatsPerMinuteLabel
             )
 
 
@@ -86,6 +86,14 @@ class MetronomeViewModel(
                 .filterIsInstance<Command.TogglePlayback>()
                 .collect {
                     metronome.handleCommand(Metronome.Command.TogglePlayback)
+                }
+        }
+
+        viewModelScope.launch {
+            commands
+                .filterIsInstance<Command.SetBeatsPerMinute>()
+                .collect { command ->
+                    metronome.handleCommand(Metronome.Command.UpdateSetting.BeatsPerMinute(command.value))
                 }
         }
     }

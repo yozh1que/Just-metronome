@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
 import studio.codescape.metronome.conductor.domain.model.Conductor
-import studio.codescape.metronome.conductor.domain.usecase.settings.GetConductorSettings
 import studio.codescape.metronome.di.SessionScope
+import studio.codescape.metronome.domain.model.settings.Settings
 import studio.codescape.metronome.player.domain.model.Player
 import kotlin.coroutines.CoroutineContext
 
@@ -24,35 +24,32 @@ import kotlin.coroutines.CoroutineContext
 class Metronome(
     private val conductor: Conductor,
     private val player: Player,
-    private val getConductorSettings: GetConductorSettings,
     parentCoroutineContext: CoroutineContext
 ) : CoroutineScope {
 
     sealed interface Command {
         data object TogglePlayback : Command
+        sealed interface UpdateSetting : Command {
+            data class BeatsPerMinute(val value: Int) : UpdateSetting
+        }
     }
 
     sealed interface State {
+
+        val settings: Settings?
 
         data object Loading : State {
             override val settings: Settings? = null
         }
 
-        val settings: Settings?
-
-        sealed interface Ready : State {
-
+        data class Resumed(
             override val settings: Settings
+        ) : State
 
-            data class Resumed(
-                override val settings: Settings
-            ) : Ready
+        data class Paused(
+            override val settings: Settings
+        ) : State
 
-            data class Paused(
-                override val settings: Settings
-            ) : Ready
-
-        }
     }
 
     override val coroutineContext: CoroutineContext = parentCoroutineContext + Job()
@@ -67,44 +64,57 @@ class Metronome(
 
     private fun produceState() = combine(
         conductor.state,
-        getConductorSettings()
-    ) { conductorState, conductorSettings ->
-        when (conductorState) {
-            is Conductor.State.Paused -> State.Ready.Paused(
-                settings = Settings(conductorSettings),
+        player.state
+    ) { conductorState, playerState ->
+        println("conductorState: $conductorState, playerState: $playerState")
+        when {
+            conductorState is Conductor.State.Resumed && playerState is Player.State.Ready ->
+                State.Resumed(Settings(conductorState.settings, playerState.settings))
+
+            conductorState is Conductor.State.Paused && playerState is Player.State.Ready -> State.Paused(
+                Settings(conductorState.settings, playerState.settings)
             )
 
-            is Conductor.State.Resumed -> State.Ready.Resumed(
-                settings = Settings(conductorSettings)
-            )
+            else -> State.Loading
         }
-    }
-        .stateIn(this, SharingStarted.WhileSubscribed(), State.Loading)
+    }.stateIn(this, SharingStarted.WhileSubscribed(), State.Loading)
 
     private fun produceSideEffects() {
+        togglePlayback()
         launch {
-            commands.filterIsInstance<Command.TogglePlayback>()
-                .collect {
-                    conductor.handleCommand(Conductor.Command.Toggle)
+            commands.filterIsInstance<Command.UpdateSetting>().collect { command ->
+                when (command) {
+                    is Command.UpdateSetting.BeatsPerMinute -> conductor.handleCommand(
+                        Conductor.Command.SetBeatsPerMinute(command.value)
+                    )
                 }
+            }
         }
-        launch {
-            state
-                .flatMapLatest { state ->
-                    when (state) {
-                        is State.Ready.Resumed -> conductor.effects
-                        else -> emptyFlow()
-                    }
-                }
-                .collect {
-                    player.handleCommand(Player.Command.PlaySound)
-                }
+        setupBeatPlayback()
+    }
 
+    private fun setupBeatPlayback() {
+        launch {
+            state.flatMapLatest { state ->
+                when (state) {
+                    is State.Resumed -> conductor.effects
+                    else -> emptyFlow()
+                }
+            }.collect {
+                player.handleCommand(Player.Command.PlaySound)
+            }
         }
     }
 
-    val beats = conductor.effects
-        .map { }
+    private fun togglePlayback() {
+        launch {
+            commands.filterIsInstance<Command.TogglePlayback>().collect {
+                conductor.handleCommand(Conductor.Command.Toggle)
+            }
+        }
+    }
+
+    val beats = conductor.effects.map { }
 
     fun handleCommand(command: Command) {
         launch {
@@ -113,7 +123,3 @@ class Metronome(
     }
 
 }
-
-
-typealias ConductorSettings = studio.codescape.metronome.conductor.domain.model.settings.Settings
-typealias PlayerSettings = studio.codescape.metronome.player.domain.model.settings.Settings

@@ -21,7 +21,14 @@ fun MetronomeScreen(getMetronomeViewModel: () -> MetronomeViewModel) {
     val viewModel = viewModel(getMetronomeViewModel)
     val state by viewModel.state.collectAsStateWithLifecycle()
     MetronomeScreen(
-        onPlayPauseClick = { viewModel.handleCommand(MetronomeViewModel.Command.TogglePlayback) },
+        onTogglePlaybackClick = { viewModel.handleCommand(MetronomeViewModel.Command.TogglePlayback) },
+        onBeatsPerMinuteChange = { value ->
+            viewModel.handleCommand(
+                MetronomeViewModel.Command.SetBeatsPerMinute(
+                    value
+                )
+            )
+        },
         beatsPerMinute = state.beatsPerMinuteLabel,
     )
 }
@@ -29,7 +36,8 @@ fun MetronomeScreen(getMetronomeViewModel: () -> MetronomeViewModel) {
 @Composable
 private fun MetronomeScreen(
     modifier: Modifier = Modifier,
-    onPlayPauseClick: () -> Unit,
+    onTogglePlaybackClick: () -> Unit,
+    onBeatsPerMinuteChange: (Int) -> Unit,
     beatsPerMinute: String,
 ) = Scaffold(modifier = modifier) { paddingValues ->
     Column(
@@ -38,7 +46,7 @@ private fun MetronomeScreen(
             .padding(paddingValues)
     ) {
         Text(beatsPerMinute)
-        Button(onClick = onPlayPauseClick) {
+        Button(onClick = onTogglePlaybackClick) {
             Text("Play/Pause")
         }
     }
@@ -48,7 +56,8 @@ private fun MetronomeScreen(
 @Composable
 private fun PreviewMetronomeScreen() = JustMetronomeTheme {
     MetronomeScreen(
-        onPlayPauseClick = {},
+        onTogglePlaybackClick = {},
+        onBeatsPerMinuteChange = {},
         beatsPerMinute = "120"
     )
 }

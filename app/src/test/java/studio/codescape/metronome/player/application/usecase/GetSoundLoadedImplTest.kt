@@ -6,10 +6,7 @@ import androidx.media3.common.Player
 import androidx.media3.test.utils.TestExoPlayerBuilder
 import androidx.media3.test.utils.robolectric.ShadowMediaCodecConfig
 import androidx.media3.test.utils.robolectric.TestPlayerRunHelper
-import kotlinx.coroutines.async
-import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -41,7 +38,7 @@ class GetSoundLoadedImplTest {
     fun `loads player with provided sound`() = runTest {
         val player = TestExoPlayerBuilder(RuntimeEnvironment.getApplication()).build()
         val getPlayerSettings = mock<GetPlayerSettings>()
-        whenever(getPlayerSettings.invoke()).thenReturn(flowOf(Settings(stubSoundUri)))
+        whenever(getPlayerSettings.invoke()).thenReturn(flowOf(Settings(STUB_SOUND_URI)))
 
         coroutineScope {
             launch {
@@ -62,14 +59,14 @@ class GetSoundLoadedImplTest {
         )
 
         assertEquals(
-            Uri.parse(stubSoundUri),
+            Uri.parse(STUB_SOUND_URI),
             player.getMediaItemAt(0).localConfiguration?.uri
         )
 
     }
 
     private companion object {
-        private const val stubSoundUri = "file:///android_asset/beats/rimshot.mp3"
+        private const val STUB_SOUND_URI = "file:///android_asset/beats/rimshot.mp3"
     }
 
 }

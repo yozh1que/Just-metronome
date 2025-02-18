@@ -5,15 +5,14 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.preferencesDataStoreFile
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import me.tatarka.inject.annotations.Component
 import me.tatarka.inject.annotations.Provides
 import me.tatarka.inject.annotations.Scope
-import studio.codescape.metronome.common.di.IoDispatcher
-import studio.codescape.metronome.conductor.domain.repository.SettingsRepository
+import studio.codescape.metronome.common.di.CoroutineDispatchers
 import studio.codescape.metronome.conductor.application.repository.SettingsRepositoryDataStoreImpl
 import studio.codescape.metronome.conductor.domain.model.Conductor
+import studio.codescape.metronome.conductor.domain.repository.SettingsRepository
 import studio.codescape.metronome.conductor.domain.usecase.settings.GetConductorSettings
 import kotlin.coroutines.CoroutineContext
 
@@ -27,7 +26,7 @@ annotation class ConductorScope
 @ConductorScope
 abstract class ConductorComponent(
     @get:Provides val context: Context,
-    @get:Provides val ioDispatcher: IoDispatcher = Dispatchers.IO,
+    @get:Provides val coroutineDispatchers: CoroutineDispatchers,
     @get:Provides val parentCoroutineContext: CoroutineContext,
     @get:Provides val storageFileName: ConductorStorageFileName = DEFAULT_DATA_STORE_FILE_NAME,
 ) : ConductorSettings.RepositoryComponent {
@@ -40,7 +39,7 @@ abstract class ConductorComponent(
     }
 }
 
-class ConductorSettings {
+internal class ConductorSettings {
 
     interface RepositoryComponent {
 
@@ -51,12 +50,12 @@ class ConductorSettings {
         @ConductorScope
         fun dataStore(
             context: Context,
-            ioDispatcher: IoDispatcher,
+            coroutineDispatchers: CoroutineDispatchers,
             parentCoroutineContext: CoroutineContext,
             storageFileName: ConductorStorageFileName
         ): DataStore<androidx.datastore.preferences.core.Preferences> =
             PreferenceDataStoreFactory.create(
-                scope = CoroutineScope(parentCoroutineContext + Job() + ioDispatcher)
+                scope = CoroutineScope(parentCoroutineContext + Job() + coroutineDispatchers.io)
             ) {
                 context.preferencesDataStoreFile(storageFileName)
             }

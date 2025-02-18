@@ -9,34 +9,30 @@ import org.mockito.Mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import studio.codescape.metronome.conductor.domain.model.settings.Settings
-import studio.codescape.metronome.conductor.domain.usecase.settings.SettingsInteractor
+import studio.codescape.metronome.conductor.domain.repository.SettingsRepository
+import studio.codescape.metronome.conductor.domain.usecase.settings.GetConductorSettings
 import studio.codescape.metronome.test.StateHolderTest
 import studio.codescape.metronome.test.observer.observe
 import kotlin.coroutines.CoroutineContext
 
 class ConductorTest : StateHolderTest<Conductor>() {
 
+    @Mock
+    private lateinit var mockGetConductorSettings: GetConductorSettings
 
     @Mock
-    private lateinit var mockSettingsInteractor: SettingsInteractor
+    private lateinit var mockSettingsRepository: SettingsRepository
 
     override fun createStateHolder(parentCoroutineContext: CoroutineContext): Conductor = Conductor(
-        settingsInteractor = mockSettingsInteractor,
+        getConductorSettings = mockGetConductorSettings,
+        settingsRepository = mockSettingsRepository,
         parentCoroutineContext = parentCoroutineContext
     )
 
     @Before
     override fun before() {
         super.before()
-        whenever(mockSettingsInteractor.settings).thenReturn(flowOf(STUB_SETTINGS))
-    }
-
-    @Test
-    fun `initially idle`() = runStateHolderTest { metronome ->
-        metronome.state.observe {
-            advanceUntilIdle()
-            expectValues(Conductor.State.Paused)
-        }
+        whenever(mockGetConductorSettings.invoke()).thenReturn(flowOf(STUB_SETTINGS))
     }
 
     @Test
@@ -47,8 +43,9 @@ class ConductorTest : StateHolderTest<Conductor>() {
                 metronome.handleCommand(Conductor.Command.Toggle)
                 advanceUntilIdle()
                 expectValues(
-                    Conductor.State.Paused,
-                    Conductor.State.Resumed
+                    Conductor.State.Loading,
+                    Conductor.State.Paused(STUB_SETTINGS),
+                    Conductor.State.Resumed(STUB_SETTINGS)
                 )
             }
         }
@@ -67,7 +64,7 @@ class ConductorTest : StateHolderTest<Conductor>() {
                     advanceTimeFor1Beat()
                     expectValues(*(0..iter).map { Conductor.Effect.Beat }.toTypedArray())
                 }
-                verify(mockSettingsInteractor).settings
+                verify(mockGetConductorSettings).invoke()
             }
         }
 

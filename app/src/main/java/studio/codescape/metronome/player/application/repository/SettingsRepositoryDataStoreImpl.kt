@@ -13,7 +13,7 @@ import kotlin.reflect.typeOf
 @Inject
 @PlayerScope
 class SettingsRepositoryDataStoreImpl(
-    dataStore: DataStore<Preferences>,
+    dataStore: DataStore<Preferences>
 ) : SettingsRepository {
 
     private val itemRepository = PreferenceItemRepository<Settings>(

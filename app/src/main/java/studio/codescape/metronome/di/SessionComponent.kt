@@ -8,9 +8,11 @@ import me.tatarka.inject.annotations.Scope
 import studio.codescape.metronome.common.di.CoroutineDispatchers
 import studio.codescape.metronome.conductor.di.ConductorComponent
 import studio.codescape.metronome.conductor.di.create
+import studio.codescape.metronome.conductor.domain.usecase.settings.GetConductorSettings
 import studio.codescape.metronome.domain.model.Metronome
 import studio.codescape.metronome.player.di.PlayerComponent
 import studio.codescape.metronome.player.di.create
+import studio.codescape.metronome.player.domain.usecase.settings.GetPlayerSettings
 import studio.codescape.metronome.ui.MetronomeScreen
 import kotlin.coroutines.CoroutineContext
 
@@ -46,7 +48,6 @@ abstract class SessionComponent(
     ): Metronome = Metronome(
         conductorComponent.conductor,
         playerComponent.player,
-        conductorComponent.getConductorSettings,
         sessionCoroutineScope.coroutineContext
     )
 
@@ -59,11 +60,17 @@ abstract class SessionComponent(
     @Provides
     internal fun conductorComponent(
         context: Context,
+        coroutineDispatchers: CoroutineDispatchers,
         sessionCoroutineScope: SessionCoroutineScope,
     ): ConductorComponent = ConductorComponent::class.create(
         context = context,
+        coroutineDispatchers = coroutineDispatchers,
         parentCoroutineContext = sessionCoroutineScope.coroutineContext
     )
+
+    @Provides
+    internal fun getConductorSettings(conductorComponent: ConductorComponent): GetConductorSettings =
+        conductorComponent.getConductorSettings
 
     @SessionScope
     @Provides
@@ -73,6 +80,10 @@ abstract class SessionComponent(
         sessionCoroutineScope: SessionCoroutineScope,
         getPlayerComponent: GetPlayerComponent
     ): PlayerComponent = getPlayerComponent(context, coroutineDispatchers, sessionCoroutineScope)
+
+    @Provides
+    internal fun getPlayerSettings(playerComponent: PlayerComponent): GetPlayerSettings =
+        playerComponent.getPlayerSettings
 
     companion object {
         internal fun getPlayerComponent(

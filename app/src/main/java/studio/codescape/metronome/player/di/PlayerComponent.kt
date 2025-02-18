@@ -18,6 +18,7 @@ import studio.codescape.metronome.player.domain.model.Player
 import studio.codescape.metronome.player.domain.repository.SettingsRepository
 import studio.codescape.metronome.player.domain.usecase.GetSoundLoaded
 import studio.codescape.metronome.player.domain.usecase.PlaySound
+import studio.codescape.metronome.player.domain.usecase.settings.GetPlayerSettings
 import kotlin.coroutines.CoroutineContext
 
 
@@ -40,6 +41,7 @@ abstract class PlayerComponent(
 ) : PlayerSettings {
 
     abstract val player: Player
+    abstract val getPlayerSettings: GetPlayerSettings
 
     internal val PlaySoundImpl.bind: PlaySound
         @Provides get() = this

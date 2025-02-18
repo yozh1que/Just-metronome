@@ -43,11 +43,11 @@ class Player(
 
     sealed interface State {
 
-        val settings: Settings
+        val settings: Settings?
 
-        data class Loading(
-            override val settings: Settings
-        ) : State
+        data object Loading : State {
+            override val settings: Settings? = null
+        }
 
         data class Ready(
             override val settings: Settings
@@ -73,12 +73,12 @@ class Player(
 
     private fun produceState() = getPlayerSettings()
         .flatMapLatest { settings ->
+            println("settings: $settings")
             getSoundLoaded()
                 .map<Unit, State> { State.Ready(settings) }
-                .onStart { emit(State.Loading(settings)) }
                 .catch { emit(State.Failure(settings)) }
         }
-        .stateIn(this, SharingStarted.Lazily, null)
+        .stateIn(this, SharingStarted.Lazily, State.Loading)
 
     private fun produceSideEffects() {
         playSoundBeats()
