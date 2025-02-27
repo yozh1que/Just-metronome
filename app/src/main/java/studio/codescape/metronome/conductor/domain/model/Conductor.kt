@@ -95,9 +95,10 @@ class Conductor(
         .flatMapLatest { state ->
             when (state) {
                 is State.Resumed -> flow {
+                    val delay = ONE_MINUTE_MILLIS / state.settings.beatsPerMinute
                     while (isActive) {
                         emit(Effect.Beat)
-                        delay(ONE_MINUTE_MILLIS / state.settings.beatsPerMinute)
+                        delay(delay)
                     }
                 }
 

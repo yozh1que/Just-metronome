@@ -25,6 +25,8 @@ class GetSoundLoadedImpl(
                         val readyListener = object : Player.Listener {
 
                             init {
+
+                                player.addListener(this)
                                 player.setMediaItem(MediaItem.fromUri(Uri.parse(settings.soundUri)))
                                 player.prepare()
                             }
@@ -37,7 +39,6 @@ class GetSoundLoadedImpl(
                                 }
                             }
                         }
-                        player.addListener(readyListener)
                         continuation.invokeOnCancellation {
                             player.removeListener(readyListener)
                         }

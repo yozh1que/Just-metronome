@@ -1,6 +1,7 @@
 package studio.codescape.metronome.player.di
 
 import android.content.Context
+import android.media.SoundPool
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.preferencesDataStoreFile
@@ -11,6 +12,7 @@ import me.tatarka.inject.annotations.Component
 import me.tatarka.inject.annotations.Provides
 import me.tatarka.inject.annotations.Scope
 import studio.codescape.metronome.common.di.CoroutineDispatchers
+import studio.codescape.metronome.player.application.AudioTrackPlayer
 import studio.codescape.metronome.player.application.repository.SettingsRepositoryDataStoreImpl
 import studio.codescape.metronome.player.application.usecase.GetSoundLoadedImpl
 import studio.codescape.metronome.player.application.usecase.PlaySoundImpl
@@ -58,7 +60,7 @@ abstract class PlayerComponent(
      companion object {
         const val DEFAULT_DATA_STORE_FILE_NAME = "player settings"
         fun getMediaPlayer(context: Context): androidx.media3.common.Player =
-            ExoPlayer.Builder(context).build()
+            AudioTrackPlayer(context)
     }
 }
 
